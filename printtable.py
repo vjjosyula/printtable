@@ -1,4 +1,2 @@
-print(1 * 7)
-print(2 * 7)
-print(3 * 7)
-print(4 * 7)
+for i in range(1, 5):
+    print(i * 7)
