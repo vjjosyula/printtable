@@ -1,5 +1,5 @@
-def multtable():
-    for i in range(1, 5):
-        print(i * 7)
+def multtable(number, limit):
+    for i in range(1, limit+1):
+        print(i * number)
 
-multtable()
+multtable(7, 10)
