@@ -3,3 +3,6 @@ def multtable(number, limit):
         print(i * number)
 
 multtable(7, 10)
+def powertable(power, number):
+    for i in range(1, number+1):
+        print(i ** power)
