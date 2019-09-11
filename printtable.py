@@ -6,3 +6,4 @@ multtable(7, 10)
 def powertable(power, number):
     for i in range(1, number+1):
         print(i ** power)
+powertable(2,6)
