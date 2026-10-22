@@ -252,10 +252,20 @@ export const Overlay: React.FC = () => {
         />
       ) : null}
       {LOGO_FILE && t > 1.5 && t < 82.6 ? (
-        <Img
-          src={staticFile(LOGO_FILE)}
-          style={{position: 'absolute', left: 80, bottom: 80, height: square ? 34 : 40, width: 'auto', opacity: 0.85 * interpolate(t, [1.5, 2.5, 81.8, 82.6], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}}
-        />
+        <div
+          style={{
+            position: 'absolute',
+            left: 80,
+            bottom: 80,
+            padding: '10px 16px',
+            borderRadius: 16,
+            background: 'rgba(244,241,236,0.88)',
+            boxShadow: '0 6px 20px rgba(63,68,74,0.08)',
+            opacity: interpolate(t, [1.5, 2.5, 81.8, 82.6], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}),
+          }}
+        >
+          <Img src={staticFile(LOGO_FILE)} style={{height: square ? 40 : 46, width: 'auto', display: 'block'}} />
+        </div>
       ) : null}
       {sf < 420 ? <MarkTags sf={sf} w={width} h={height} /> : null}
       {sf > 600 && sf < 870 ? <TrackLabels sf={sf} w={width} h={height} /> : null}
@@ -266,13 +276,14 @@ export const Overlay: React.FC = () => {
       {t >= endStart ? (
         <div style={{position: 'absolute', left: 80, right: 80, bottom: 80, fontFamily, color: C.charcoal}}>
           {LOGO_FILE ? (
-            <EndLine t={t} at={83.2} style={{marginBottom: square ? 14 : 22}}>
-              <Img src={staticFile(LOGO_FILE)} style={{height: square ? 64 : 84, width: 'auto', display: 'block'}} />
+            <EndLine t={t} at={83.3} style={{marginBottom: square ? 4 : 8}}>
+              <Img src={staticFile(LOGO_FILE)} style={{height: square ? 112 : 136, width: 'auto', display: 'block'}} />
             </EndLine>
-          ) : null}
-          <EndLine t={t} at={83.4} style={{fontWeight: 800, fontSize: square ? 70 : 84, letterSpacing: -1, lineHeight: 1.05}}>
-            NEXUS Epigenomics
-          </EndLine>
+          ) : (
+            <EndLine t={t} at={83.4} style={{fontWeight: 800, fontSize: square ? 70 : 84, letterSpacing: -1, lineHeight: 1.05}}>
+              NEXUS Epigenomics
+            </EndLine>
+          )}
           <EndLine t={t} at={84.2} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: square ? 12 : 20, lineHeight: 1.25}}>
             Founded in Stockholm, 2024.
           </EndLine>
