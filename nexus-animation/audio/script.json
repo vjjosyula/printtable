@@ -45,48 +45,52 @@
   "show": "Neurons, astrocytes, oligodendrocytes and microglia each read different genes."
  },
  {
-  "start": 42.4,
-  "say": "But most epigenome profiling grinds the whole tissue together.",
-  "show": "But most epigenome profiling grinds the whole tissue together."
+  "start": 41.6,
+  "say": "DNA methylation adds a second layer, written on the DNA itself.",
+  "show": "DNA methylation adds a second layer, written on the DNA itself.",
+  "speed": 1.1
  },
  {
-  "start": 47.4,
-  "say": "Every cell type's signal is diluted into one average.",
-  "show": "Every cell type's signal is diluted into one average."
+  "start": 46.0,
+  "say": "But most methods read one histone mark at a time, so on and off genes are measured in separate samples.",
+  "show": "But most methods read one histone mark at a time, so on and off genes are measured in separate samples."
  },
  {
-  "start": 51.6,
-  "say": "Peaks unique to one cell type shrink, and rare cells like microglia nearly disappear.",
-  "show": "Peaks unique to one cell type shrink, and rare cells like microglia nearly disappear."
+  "start": 52.0,
+  "say": "Methylation maps rely on bisulfite, which damages DNA, and on very deep sequencing.",
+  "show": "Methylation maps rely on bisulfite, which damages DNA, and on very deep sequencing.",
+  "speed": 1.1
  },
  {
-  "start": 57.4,
+  "start": 58.3,
+  "say": "And the best methods stayed in the labs that built them.",
+  "show": "And the best methods stayed in the labs that built them."
+ },
+ {
+  "start": 65.0,
   "say": "NEXUS Epigenomics was founded in Stockholm in 2024 to close these gaps,",
-  "show": "NEXUS Epigenomics was founded in Stockholm in 2024 to close these gaps,"
+  "show": "NEXUS Epigenomics was founded in Stockholm in 2024 to close these gaps,",
+  "speed": 1.1
  },
  {
-  "start": 63.4,
-  "say": "with two ready-to-use kits: Metland and Histland.",
-  "show": "with two ready-to-use kits: MeTLAND and Histland."
+  "start": 70.65,
+  "say": "turning methods published in Nature Biotechnology into ready-to-use kits.",
+  "show": "turning methods published in Nature Biotechnology into ready-to-use kits.",
+  "speed": 1.1
  },
  {
-  "start": 68.4,
-  "say": "Metland maps DNA methylation in bulk samples, including cell types you sort first.",
-  "show": "MeTLAND maps DNA methylation in bulk samples, including cell types you sort first."
+  "start": 75.9,
+  "say": "Histland reads two histone marks from one sample, in bulk or in single cells.",
+  "show": "HisTLAND reads two histone marks from one sample, in bulk or in single cells."
  },
  {
-  "start": 73.9,
-  "say": "Histland maps histone modifications, in bulk or in single cells.",
-  "show": "Histland maps histone modifications, in bulk or in single cells."
+  "start": 80.7,
+  "say": "Metland maps DNA methylation without bisulfite or antibodies.",
+  "show": "MeTLAND maps DNA methylation without bisulfite or antibodies."
  },
  {
-  "start": 79.3,
-  "say": "Two layers of the epigenome, ready to use in your own lab.",
-  "show": "Two layers of the epigenome, ready to use in your own lab."
- },
- {
-  "start": 84.8,
-  "say": "What is the question you are solving in epigenetics?",
-  "show": "What is the question you are solving in epigenetics?"
+  "start": 85.6,
+  "say": "Want to know more? Read the paper. We'll drop the link in the comments.",
+  "show": "Want to know more? Read the paper. We'll drop the link in the comments."
  }
 ]

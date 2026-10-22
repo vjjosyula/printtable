@@ -92,7 +92,7 @@ pattern = [0, 2, 4, 3, 1, 4, 2, 3]
 step = BEAT / 2
 time = 0.0
 i = 0
-while time < 85.0:
+while time < 86.0:
     # sections: intro, histones, marks, pull-back lift, the gap (muted once blended), bright resolve
     if time < 2.5:
         dens, gain, br = 2, 0.0, 0.6
@@ -102,14 +102,10 @@ while time < 85.0:
         dens, gain, br = 1, 0.12, 0.9
     elif time < 42:
         dens, gain, br = 1, 0.15, 1.0
-    elif time < 48.5:
-        dens, gain, br = 2, 0.10, 0.7
-    elif time < 57:
-        dens, gain, br = 2, 0.07, 0.35  # blended into the average: muted, darker
-    elif time < 63:
-        dens, gain, br = 1, 0.14, 1.1  # four sharp signals again
-    elif time < 67:
-        dens, gain, br = 2, 0.08, 0.8  # dive into the peak
+    elif time < 45:
+        dens, gain, br = 2, 0.11, 0.8  # dive into the nucleus, methylation
+    elif time < 65:
+        dens, gain, br = 2, 0.07, 0.4  # the gaps: muted, darker
     else:
         dens, gain, br = 1, 0.15, 1.15  # the kits
     if i % dens == 0 and gain > 0:
@@ -121,12 +117,12 @@ while time < 85.0:
 
 # ---------------------------------------------------------------- bass (soft sine, on bars)
 b_time = 10.0
-while b_time < 84.0:
+while b_time < 85.0:
     root = chord_at(b_time)[0] - 12
     n = int(BAR * SR)
     tt = np.arange(n) / SR
     s = np.sin(2 * np.pi * midi(root) * tt) * np.exp(-tt * 1.2) * np.minimum(1, tt * 60)
-    g = 0.22 if not (48.5 <= b_time < 57) else 0.11
+    g = 0.22 if not (45 <= b_time < 65) else 0.11
     add(s, b_time, g, 0)
     b_time += BAR
 
@@ -143,8 +139,8 @@ def shaker():
 
 bt = 10.0
 j = 0
-while bt < 82.5:
-    if not (48.5 <= bt < 57 or 63 <= bt < 67):
+while bt < 84.5:
+    if not (45 <= bt < 65):
         if j % 2 == 0:
             add(kick(), bt, 0.30, 0)
         add(shaker(), bt + BEAT / 2, 0.035, 0.4 * (-1) ** j)
@@ -202,27 +198,36 @@ add(riser(1.8, 250, 6000), 29.4, 0.045, 0)                 # into the pull-back
 add(whoosh(2.8), 31.2, 0.10, -0.2)
 add(whoosh(2.4), 34.6, 0.07, 0.2)
 add(whoosh(2.4), 38.0, 0.06, -0.1)
-add(chime(76, 3.0), 42.2, 0.08, -0.3)                      # tracks rise
-add(chime(79, 3.0), 42.7, 0.07, 0.3)
-add(chime(83, 3.0), 43.3, 0.06, 0.0)
-add(whoosh(3.5), 48.5, 0.08, 0)                            # tissue swirls / blends
-add(riser(1.5, 300, 5000), 55.6, 0.04, 0)                  # split back into four
-for q, m in enumerate([72, 76, 79, 84]):
-    add(chime(m, 2.6), 57.2 + q * 0.18, 0.07, -0.45 + q * 0.3)
-add(riser(2.2, 250, 7000), 62.4, 0.05, 0)                  # dive into the neuron peak
-add(whoosh(3.0), 63.6, 0.11, 0)
-add(chime(88, 3.0), 66.6, 0.07, 0)                          # arrival at the molecule
-add(whoosh(4.0), 67.6, 0.04, -0.3)                          # MeTLAND scan along the DNA
-for q in range(9):                                          # methyl groups appearing
-    add(pop(1568 + 90 * (q % 3)) * 0.6, 68.1 + q * 0.45, 0.07, -0.5 + q * 0.12)
-for q, at in enumerate([73.33, 74.07, 74.67, 75.33, 75.93]):  # histone marks (Histland)
-    add(pop(988 if q < 3 else 784), at, 0.17, -0.3 + q * 0.15)
+add(riser(1.8, 250, 6000), 40.4, 0.04, 0)                  # dive into the neuron nucleus
+add(whoosh(2.6), 41.4, 0.09, 0)
+for q in range(6):                                          # methyl groups appear on the DNA
+    add(pop(1568 + 90 * (q % 3)) * 0.6, 42.5 + q * 0.33, 0.08, -0.5 + q * 0.2)
+add(pop(988), 45.0, 0.16, -0.2)                             # blue and coral marks
+add(pop(784), 45.15, 0.14, 0.2)
+add(click(), 46.7, 0.22, -0.2)                              # reader docks on the blue mark only
+add(chime(76, 2.4), 48.6, 0.06, -0.3)                       # sample 1
+add(chime(72, 2.4), 49.2, 0.06, 0.3)                        # sample 2
+add(thud(), 53.4, 0.22, 0)                                  # harsh treatment
+for q in range(5):                                          # fragments break off
+    add(click() * 0.7, 53.9 + q * 0.32, 0.12, -0.4 + q * 0.2)
+add(riser(3.0, 200, 3000), 54.8, 0.03, 0)                   # reads pile up
+for q in range(12):                                         # requests land on the pile
+    add(click() * 0.5, 60.3 + q * 0.38, 0.06, 0.4 * (-1) ** q)
+add(riser(1.6, 300, 6000), 63.8, 0.05, 0)                   # protocol becomes a kit
+add(chime(84, 3.0), 65.6, 0.08, 0)
+for q in range(8):                                          # kits arrive in every lab
+    add(chime([72, 76, 79, 84][q % 4] + 12 * (q // 4), 2.2), 67.5 + q * 0.28, 0.05, -0.5 + q * 0.14)
+add(click(), 76.6, 0.2, -0.2)                               # two readers dock together
+add(click(), 76.75, 0.2, 0.2)
+add(chime(79, 2.4), 77.4, 0.06, 0)                          # two tracks from one tube
+for q in range(4):                                          # short read stack
+    add(pop(1318) * 0.5, 81.5 + q * 0.3, 0.06, -0.3 + q * 0.2)
 
 # ---------------------------------------------------------------- final chord + tail
 fin_n = int(6.0 * SR)
 tt = np.arange(fin_n) / SR
 fin = sum(np.sin(2 * np.pi * midi(m) * tt) for m in [53, 60, 65, 69, 72, 76]) / 6
-add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 83.2, 0.22, 0)
+add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 85.2, 0.22, 0)
 
 music = np.stack([L, R], 1)
 # gentle master: fade in/out, soft clip
