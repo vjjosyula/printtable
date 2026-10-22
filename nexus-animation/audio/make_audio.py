@@ -1,4 +1,4 @@
-"""Procedural music bed + sound accents + narration mix for the NEXUS animation (70.0 s).
+"""Procedural music bed + sound accents + narration mix for the NEXUS animation (90.0 s).
 
 Everything is synthesised here (no samples, no licensing). Narration WAVs come from Kokoro TTS
 (one file per line, see gen_narration.py). Output: 48 kHz stereo WAV.
@@ -10,7 +10,7 @@ import soundfile as sf
 from scipy.signal import butter, sosfilt, resample_poly
 
 SR = 48000
-DUR = 70.0
+DUR = 90.0
 N = int(SR * DUR)
 t = np.arange(N) / SR
 rng = np.random.default_rng(7)
@@ -92,7 +92,7 @@ pattern = [0, 2, 4, 3, 1, 4, 2, 3]
 step = BEAT / 2
 time = 0.0
 i = 0
-while time < 66.0:
+while time < 85.0:
     # sections: intro, histones, marks, pull-back lift, the gap (muted once blended), bright resolve
     if time < 2.5:
         dens, gain, br = 2, 0.0, 0.6
@@ -106,8 +106,12 @@ while time < 66.0:
         dens, gain, br = 2, 0.10, 0.7
     elif time < 57:
         dens, gain, br = 2, 0.07, 0.35  # blended into the average: muted, darker
+    elif time < 63:
+        dens, gain, br = 1, 0.14, 1.1  # four sharp signals again
+    elif time < 67:
+        dens, gain, br = 2, 0.08, 0.8  # dive into the peak
     else:
-        dens, gain, br = 1, 0.14, 1.1
+        dens, gain, br = 1, 0.15, 1.15  # the kits
     if i % dens == 0 and gain > 0:
         ch = chord_at(time)
         m = ch[pattern[i % 8] % len(ch)] + 12
@@ -117,7 +121,7 @@ while time < 66.0:
 
 # ---------------------------------------------------------------- bass (soft sine, on bars)
 b_time = 10.0
-while b_time < 66.0:
+while b_time < 84.0:
     root = chord_at(b_time)[0] - 12
     n = int(BAR * SR)
     tt = np.arange(n) / SR
@@ -139,8 +143,8 @@ def shaker():
 
 bt = 10.0
 j = 0
-while bt < 64.5:
-    if not (48.5 <= bt < 57):
+while bt < 82.5:
+    if not (48.5 <= bt < 57 or 63 <= bt < 67):
         if j % 2 == 0:
             add(kick(), bt, 0.30, 0)
         add(shaker(), bt + BEAT / 2, 0.035, 0.4 * (-1) ** j)
@@ -205,12 +209,20 @@ add(whoosh(3.5), 48.5, 0.08, 0)                            # tissue swirls / ble
 add(riser(1.5, 300, 5000), 55.6, 0.04, 0)                  # split back into four
 for q, m in enumerate([72, 76, 79, 84]):
     add(chime(m, 2.6), 57.2 + q * 0.18, 0.07, -0.45 + q * 0.3)
+add(riser(2.2, 250, 7000), 62.4, 0.05, 0)                  # dive into the neuron peak
+add(whoosh(3.0), 63.6, 0.11, 0)
+add(chime(88, 3.0), 66.6, 0.07, 0)                          # arrival at the molecule
+add(whoosh(4.0), 67.6, 0.04, -0.3)                          # MeTLAND scan along the DNA
+for q in range(9):                                          # methyl groups appearing
+    add(pop(1568 + 90 * (q % 3)) * 0.6, 68.1 + q * 0.45, 0.07, -0.5 + q * 0.12)
+for q, at in enumerate([73.33, 74.07, 74.67, 75.33, 75.93]):  # histone marks (Histland)
+    add(pop(988 if q < 3 else 784), at, 0.17, -0.3 + q * 0.15)
 
 # ---------------------------------------------------------------- final chord + tail
 fin_n = int(6.0 * SR)
 tt = np.arange(fin_n) / SR
 fin = sum(np.sin(2 * np.pi * midi(m) * tt) for m in [53, 60, 65, 69, 72, 76]) / 6
-add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 64.0, 0.22, 0)
+add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 83.2, 0.22, 0)
 
 music = np.stack([L, R], 1)
 # gentle master: fade in/out, soft clip

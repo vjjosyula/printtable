@@ -66,7 +66,7 @@ export const mergeAmount = (f: number) => ramp(f, 648, 706, easeInOutCubic) * (1
 const greyC = new THREE.Color(C.grey);
 const mats = Object.fromEntries(TYPES.map((t) => [t, clay(TYPE_COLOR[t])])) as Record<CellType, THREE.MeshPhysicalMaterial>;
 const fills = Object.fromEntries(TYPES.map((t) => [t, new THREE.MeshBasicMaterial({color: TYPE_COLOR[t], transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false})])) as Record<CellType, THREE.MeshBasicMaterial>;
-const outline = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide});
+const outline = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true});
 const baseMat = clay(C.charcoal);
 
 function trackGeometry(values: Float32Array, reveal: number, y0: number, amp: number, from: THREE.Vector3 | null, rise: number) {
@@ -102,7 +102,9 @@ function trackGeometry(values: Float32Array, reveal: number, y0: number, amp: nu
 
 export const Tracks: React.FC = () => {
   const f = useStoryFrame();
-  const visible = f >= 566;
+  const visible = f >= 566 && f < 905;
+  // fade out as the camera dives into the neuron peak for the kit finale
+  const out = ramp(f, 862, 900, (x) => x);
   const m = mergeAmount(f);
   const data = useMemo(() => {
     if (!visible) return null;
@@ -134,11 +136,14 @@ export const Tracks: React.FC = () => {
     return tubeGeometry(pts, 0.02, 5);
   }, []);
   if (!data) return null;
+  outline.opacity = 1 - out;
   TYPES.forEach((t) => {
     mats[t].color.set(TYPE_COLOR[t]).lerp(greyC, m);
     fills[t].color.set(TYPE_COLOR[t]).lerp(greyC, m);
     // the sand oligodendrocyte track would vanish on the light background, so it is drawn darker-edged
-    fills[t].opacity = t === 'oligo' ? 0.55 : 0.22;
+    fills[t].opacity = (t === 'oligo' ? 0.55 : 0.22) * (1 - out);
+    mats[t].transparent = out > 0;
+    mats[t].opacity = 1 - out;
   });
   return (
     <group position={NUCLEUS_CENTER} scale={TISSUE_K}>

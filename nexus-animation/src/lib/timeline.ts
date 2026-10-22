@@ -1,11 +1,11 @@
 import {useCurrentFrame} from 'remotion';
 
 export const FPS = 30;
-export const DURATION_S = 70;
+export const DURATION_S = 90;
 export const DURATION_FRAMES = DURATION_S * FPS;
 
 /**
- * The animation is choreographed on a 32 s "story clock" (frames 0..959). The 70 s cut plays it
+ * The animation is choreographed on a "story clock": 0..27 s is the original 32 s story (to the split of the tracks), 27..55 s is the kit finale. The 90 s cut plays it
  * through a smooth, monotone time remap so each beat gets room without anything ever freezing.
  * Keys: [video seconds, story seconds].
  */
@@ -17,8 +17,8 @@ const KEYS: [number, number][] = [
   [31, 13],
   [42, 19],
   [57, 25],
-  [67, 31.2],
-  [70, 32],
+  [62, 27],
+  [90, 55],
 ];
 
 // Fritsch-Carlson monotone cubic tangents

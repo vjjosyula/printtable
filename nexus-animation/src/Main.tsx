@@ -10,7 +10,8 @@ import {Chromatin} from './scene/Chromatin';
 import {Nucleus} from './scene/Nucleus';
 import {Tissue} from './scene/Tissue';
 import {Tracks} from './scene/Tracks';
-import {EndCard} from './scene/EndCard';
+import {TechScene} from './scene/TechScene';
+import {brandBackground} from './scene/background';
 import {Overlay} from './Overlay';
 import {useCurrentFrame} from 'remotion';
 import {cameraAt} from './scene/camera';
@@ -20,7 +21,7 @@ export const Main: React.FC = () => {
   const f = useStoryFrame();
   const dist = cameraAt(f).dist;
   const detail = dist < 600;
-  const showChromatin = dist < 9000;
+  const showChromatin = dist < 9000 && f < 700;
   return (
     <AbsoluteFill style={{background: C.bg}}>
       <ThreeCanvas
@@ -32,14 +33,14 @@ export const Main: React.FC = () => {
           gl.localClippingEnabled = true;
         }}
       >
-        <color attach="background" args={[C.bg]} />
+        <primitive attach="background" object={brandBackground(width, height)} />
         <fog attach="fog" args={[C.bg, 100, 600]} />
         <Lights />
         {showChromatin ? <Chromatin detail={detail} /> : null}
         {f >= 300 && f < 600 ? <Nucleus /> : null}
         <Tissue />
         <Tracks />
-        <EndCard />
+        <TechScene />
         <Rig />
       </ThreeCanvas>
       <Overlay />

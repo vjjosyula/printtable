@@ -47,7 +47,15 @@ const DIST: Key1[] = [
   [650, Math.log(98000)],
   [720, Math.log(104000)],
   [800, Math.log(96000)],
-  [860, Math.log(92000)]
+  [840, Math.log(92000)],
+  [880, Math.log(60000)],
+  [902, Math.log(5000)],
+  [925, Math.log(330)],
+  [975, Math.log(80)],
+  [1140, Math.log(70)],
+  [1320, Math.log(90)],
+  [1450, Math.log(118)],
+  [1590, Math.log(118)]
 ];
 const YAW: Key1[] = [
   [0, 0.25],
@@ -66,7 +74,12 @@ const YAW: Key1[] = [
   [470, -0.3],
   [560, -0.1],
   [700, 0],
-  [860, 0]
+  [860, 0],
+  [975, -0.55],
+  [1140, -0.25],
+  [1320, 0.2],
+  [1450, 0.05],
+  [1590, 0.0]
 ];
 const PITCH: Key1[] = [
   [0, 0.1],
@@ -81,12 +94,17 @@ const PITCH: Key1[] = [
   [600, 0.82],
   [680, 0.4],
   [760, 0.22],
-  [860, 0.12]
+  [860, 0.12],
+  [975, 0.3],
+  [1320, 0.22],
+  [1450, 0.12],
+  [1590, 0.12]
 ];
 
 /** Tissue-scale targets live in world units (tissue scale K applied). */
 export const TISSUE_K = 3400;
 export const NUCLEUS_CENTER = new THREE.Vector3(110, 0, 0);
+export const TECH_WORLD = () => TECH_ORIGIN.clone().multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER);
 const TARGET_FAR: Key3[] = [
   [430, [0, 0, 0]],
   [560, [0, 0.2, 0]],
@@ -95,15 +113,33 @@ const TARGET_FAR: Key3[] = [
   [640, [0, 10.0, 0]],
   [720, [0, 10.5, 0]],
   [780, [0, 9.5, 0]],
-  [860, [0, 8.5, 0]],
+  [820, [0, 9.0, 0]],
+  [880, [-4.08, 14.0, 0.5]],
 ];
+
+/** Where the kit finale lives: in front of the neuron track's tallest peak (tissue units). */
+export const TECH_ORIGIN = new THREE.Vector3(-4.08, 14.0, 0.5);
+const TECH_TARGET: Key3[] = [
+  [860, [0, 0, 0]],
+  [975, [0, -2, 0]],
+  [1320, [2, -2, 0]],
+  [1450, [0, 2, 0]],
+  [1590, [0, 2, 0]],
+];
+
+/** Vertical framing: subjects sit below the caption band, and rise above the end-card text. */
+export const viewOffsetY = (f: number) => 0.085 - 0.215 * THREE.MathUtils.smoothstep(f, 1400, 1470);
 
 export type CamState = {pos: THREE.Vector3; target: THREE.Vector3; dist: number; fov: number};
 
 export function cameraAt(f: number): CamState {
   const logd = spline(DIST, f);
   const dist = Math.exp(logd);
-  const near = splineV(TARGET_NEAR, f);
+  // before the finale the small-scale target is the chromatin chain; afterwards it is the kit vignette
+  const near =
+    f < 700
+      ? splineV(TARGET_NEAR, f)
+      : splineV(TECH_TARGET, f).add(TECH_ORIGIN.clone().multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
   const farLocal = splineV(TARGET_FAR, f);
   const far = farLocal.multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER);
   // blend from nanometre-scale target to tissue-scale target as the distance grows

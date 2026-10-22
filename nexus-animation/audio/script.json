@@ -61,19 +61,32 @@
  },
  {
   "start": 57.4,
-  "say": "NEXUS Epigenomics was founded in Stockholm in 2024 to close that gap,",
-  "show": "NEXUS Epigenomics was founded in Stockholm in 2024 to close that gap,",
-  "speed": 1.1
+  "say": "NEXUS Epigenomics was founded in Stockholm in 2024 to close these gaps,",
+  "show": "NEXUS Epigenomics was founded in Stockholm in 2024 to close these gaps,"
  },
  {
-  "start": 62.9,
-  "say": "with ready-to-use kits built on methods published in Nature Biotechnology.",
-  "show": "with ready-to-use kits built on methods published in Nature Biotechnology.",
-  "speed": 1.1
+  "start": 63.4,
+  "say": "with two ready-to-use kits: Metland and Histland.",
+  "show": "with two ready-to-use kits: MeTLAND and Histland."
  },
  {
-  "start": 67.4,
-  "say": "What is your biggest gap?",
-  "show": "What is your biggest gap?"
+  "start": 68.4,
+  "say": "Metland maps DNA methylation, the chemical tags on the DNA itself.",
+  "show": "MeTLAND maps DNA methylation, the chemical tags on the DNA itself."
+ },
+ {
+  "start": 73.9,
+  "say": "Histland maps histone modifications, the marks that open and lock genes.",
+  "show": "Histland maps histone modifications, the marks that open and lock genes."
+ },
+ {
+  "start": 79.3,
+  "say": "Two layers of the epigenome, ready to use in your own lab.",
+  "show": "Two layers of the epigenome, ready to use in your own lab."
+ },
+ {
+  "start": 84.8,
+  "say": "What is your biggest gap? Tell us in the comments.",
+  "show": "What is your biggest gap? Tell us in the comments."
  }
 ]

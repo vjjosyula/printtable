@@ -1,0 +1,88 @@
+1
+00:00:00,400 --> 00:00:03,146
+Every cell in your body
+carries the same DNA.
+
+2
+00:00:03,600 --> 00:00:08,577
+About two metres of it, wrapped around proteins
+called histones, like thread on spools.
+
+3
+00:00:10,200 --> 00:00:14,250
+Small chemical marks on histone tails
+decide which genes are read.
+
+4
+00:00:14,300 --> 00:00:19,734
+Here, an enzyme adds an
+activating mark, H3K27ac.
+
+5
+00:00:19,800 --> 00:00:23,735
+The nucleosomes slide apart, so
+polymerase can read the gene.
+
+6
+00:00:24,200 --> 00:00:29,227
+Elsewhere, H3K27me3 packs the DNA tightly.
+
+7
+00:00:29,300 --> 00:00:32,450
+The polymerase can't get in.
+The gene stays silent.
+
+8
+00:00:32,500 --> 00:00:35,940
+Zoom out, and every cell type has
+its own pattern of marks.
+
+9
+00:00:36,000 --> 00:00:41,317
+Neurons, astrocytes, oligodendrocytes and
+microglia each read different genes.
+
+10
+00:00:42,400 --> 00:00:46,150
+But most epigenome profiling grinds
+the whole tissue together.
+
+11
+00:00:47,400 --> 00:00:50,822
+Every cell type's signal is
+diluted into one average.
+
+12
+00:00:51,600 --> 00:00:56,746
+Peaks unique to one cell type shrink, and rare
+cells like microglia nearly disappear.
+
+13
+00:00:57,400 --> 00:01:03,214
+NEXUS Epigenomics was founded in
+Stockholm in 2024 to close these gaps,
+
+14
+00:01:03,400 --> 00:01:06,231
+with two ready-to-use kits:
+MeTLAND and Histland.
+
+15
+00:01:08,400 --> 00:01:13,162
+MeTLAND maps DNA methylation, the
+chemical tags on the DNA itself.
+
+16
+00:01:13,900 --> 00:01:18,533
+Histland maps histone modifications, the
+marks that open and lock genes.
+
+17
+00:01:19,300 --> 00:01:22,706
+Two layers of the epigenome,
+ready to use in your own lab.
+
+18
+00:01:24,800 --> 00:01:27,327
+What is your biggest gap?
+Tell us in the comments.

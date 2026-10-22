@@ -1,14 +1,16 @@
 import React from 'react';
 import * as THREE from 'three';
-import {AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig, Easing, staticFile} from 'remotion';
+import {AbsoluteFill, Img, interpolate, useCurrentFrame, useVideoConfig, Easing, staticFile} from 'remotion';
+import {LOGO_FILE} from './logo';
 import {loadFont} from '@remotion/fonts';
 import {C} from './lib/brand';
-import {FPS, storyFrame, videoSecondsForStory} from './lib/timeline';
-import {cameraAt, NUCLEUS_CENTER, TISSUE_K} from './scene/camera';
+import {FPS, storyFrame} from './lib/timeline';
+import {cameraAt, NUCLEUS_CENTER, TISSUE_K, viewOffsetY} from './scene/camera';
 import {worldAt} from './scene/state';
 import {tailPoints} from './scene/tails';
 import {mergeAmount, SLOT_Y, WIDTH, MERGED_Y} from './scene/Tracks';
 import {TYPES} from './scene/Tissue';
+import {techAnchors} from './scene/tech';
 import {ramp} from './lib/math';
 
 // Red Hat Display (Google Fonts, variable weight), bundled locally for headless rendering.
@@ -25,6 +27,11 @@ export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string;
   {from: 31.6, to: 41.6, lines: ['Every cell type reads', 'different genes.'], key: 'different'},
   {from: 42.4, to: 49.6, lines: ['Most profiling blends a tissue', 'into one average.'], key: 'average.'},
   {from: 50.0, to: 56.7, lines: ['Cell-type signals get diluted.', 'Rare cells nearly vanish.'], key: 'diluted.'},
+  {from: 57.6, to: 62.6, lines: ['NEXUS was founded', 'to close these gaps.'], key: 'gaps.'},
+  {from: 63.0, to: 67.6, lines: ['Two ready-to-use kits.', 'MeTLAND and Histland.'], key: 'Two'},
+  {from: 68.0, to: 73.6, lines: ['MeTLAND maps', 'DNA methylation.'], key: 'MeTLAND', keyColor: C.teal},
+  {from: 73.8, to: 79.6, lines: ['Histland maps', 'histone marks.'], key: 'Histland'},
+  {from: 79.9, to: 83.0, lines: ['Two layers.', 'One epigenome.'], key: 'Two'},
 ];
 
 const fadeWin = (t: number, a: number, b: number, d = 0.35) =>
@@ -79,7 +86,7 @@ function makeProjector(sf: number, w: number, h: number) {
   cam.position.copy(s.pos);
   cam.up.set(0, 1, 0);
   cam.lookAt(s.target);
-  const offY = 0.085 * (1 - THREE.MathUtils.smoothstep(sf, 740, 820));
+  const offY = viewOffsetY(sf);
   cam.setViewOffset(w, h, 0, -h * offY, w, h);
   cam.updateProjectionMatrix();
   cam.updateMatrixWorld();
@@ -168,6 +175,21 @@ const MarkTags: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
   return <>{out}</>;
 };
 
+const KitTags: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
+  const proj = makeProjector(sf, w, h);
+  const a = techAnchors(sf);
+  const oM = ramp(sf, 1000, 1020, (x) => x) * (1 - ramp(sf, 1420, 1445, (x) => x));
+  const oH = ramp(sf, 1160, 1180, (x) => x) * (1 - ramp(sf, 1420, 1445, (x) => x));
+  const pm = proj(a.methyl);
+  const ph = proj(a.mark);
+  return (
+    <>
+      {!pm.behind ? <Tag x={pm.x} y={pm.y} color={C.teal} title="MeTLAND" sub="DNA methylation" o={oM} side={pm.x > w * 0.55 ? -1 : 1} dy={150} /> : null}
+      {!ph.behind ? <Tag x={ph.x} y={ph.y} color={C.blue} title="Histland" sub="histone modifications" o={oH} side={ph.x > w * 0.5 ? -1 : 1} dy={-150} /> : null}
+    </>
+  );
+};
+
 const TYPE_LABEL: Record<string, string> = {neuron: 'Neurons', astro: 'Astrocytes', oligo: 'Oligodendrocytes', micro: 'Microglia'};
 const TYPE_TEXT: Record<string, string> = {neuron: C.blue, astro: C.teal, oligo: C.charcoal, micro: C.coral};
 
@@ -210,29 +232,57 @@ export const Overlay: React.FC = () => {
   const sf = storyFrame(f);
   const {width, height} = useVideoConfig();
   const square = height < 1200;
-  const endStart = videoSecondsForStory(786);
+  const endStart = 83.2;
+  const circle = interpolate(t, [82.6, 84.6], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
   return (
     <AbsoluteFill style={{pointerEvents: 'none'}}>
-      <MarkTags sf={sf} w={width} h={height} />
-      {sf > 600 && sf < 800 ? <TrackLabels sf={sf} w={width} h={height} /> : null}
+      {circle > 0 ? (
+        <div
+          style={{
+            position: 'absolute',
+            width: square ? 640 : 780,
+            height: square ? 640 : 780,
+            right: square ? -200 : -230,
+            bottom: square ? -230 : -250,
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${C.sand} 0%, ${C.sand} 58%, rgba(233,228,198,0) 72%)`,
+            opacity: circle,
+            transform: `scale(${0.9 + 0.1 * circle})`,
+          }}
+        />
+      ) : null}
+      {LOGO_FILE && t > 1.5 && t < 82.6 ? (
+        <Img
+          src={staticFile(LOGO_FILE)}
+          style={{position: 'absolute', left: 80, bottom: 80, height: square ? 34 : 40, width: 'auto', opacity: 0.85 * interpolate(t, [1.5, 2.5, 81.8, 82.6], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}}
+        />
+      ) : null}
+      {sf < 420 ? <MarkTags sf={sf} w={width} h={height} /> : null}
+      {sf > 600 && sf < 870 ? <TrackLabels sf={sf} w={width} h={height} /> : null}
+      {sf > 990 && sf < 1450 ? <KitTags sf={sf} w={width} h={height} /> : null}
       {CAPTIONS.map((c, i) => (
         <Caption key={i} c={c} t={t} size={square ? 54 : 60} />
       ))}
       {t >= endStart ? (
         <div style={{position: 'absolute', left: 80, right: 80, bottom: 80, fontFamily, color: C.charcoal}}>
-          <EndLine t={t} at={57.6} style={{fontWeight: 800, fontSize: square ? 70 : 84, letterSpacing: -1, lineHeight: 1.05}}>
+          {LOGO_FILE ? (
+            <EndLine t={t} at={83.2} style={{marginBottom: square ? 14 : 22}}>
+              <Img src={staticFile(LOGO_FILE)} style={{height: square ? 64 : 84, width: 'auto', display: 'block'}} />
+            </EndLine>
+          ) : null}
+          <EndLine t={t} at={83.4} style={{fontWeight: 800, fontSize: square ? 70 : 84, letterSpacing: -1, lineHeight: 1.05}}>
             NEXUS Epigenomics
           </EndLine>
-          <EndLine t={t} at={60.4} style={{fontWeight: 500, fontSize: square ? 38 : 46, marginTop: square ? 14 : 22, lineHeight: 1.25}}>
+          <EndLine t={t} at={84.2} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: square ? 12 : 20, lineHeight: 1.25}}>
             Founded in Stockholm, 2024.
           </EndLine>
-          <EndLine t={t} at={63.0} style={{fontWeight: 500, fontSize: square ? 38 : 46, marginTop: 8, lineHeight: 1.25, maxWidth: 820}}>
-            Kits built on methods published in Nature Biotechnology.
+          <EndLine t={t} at={85.0} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: 8, lineHeight: 1.25, maxWidth: 860}}>
+            Closing the gap with <span style={{fontWeight: 800, color: C.teal}}>MeTLAND</span> and <span style={{fontWeight: 800, color: C.blue}}>Histland</span>.
           </EndLine>
-          <EndLine t={t} at={67.2} style={{fontWeight: 800, fontSize: square ? 56 : 68, marginTop: square ? 20 : 34, letterSpacing: -0.5, lineHeight: 1.1}}>
+          <EndLine t={t} at={86.3} style={{fontWeight: 800, fontSize: square ? 54 : 66, marginTop: square ? 18 : 30, letterSpacing: -0.5, lineHeight: 1.1}}>
             What is your biggest gap?
           </EndLine>
-          <EndLine t={t} at={67.4} style={{fontWeight: 600, fontSize: square ? 28 : 32, marginTop: 10, color: C.blue}}>
+          <EndLine t={t} at={86.8} style={{fontWeight: 700, fontSize: square ? 32 : 38, marginTop: 10, color: C.blue}}>
             Tell us in the comments.
           </EndLine>
         </div>

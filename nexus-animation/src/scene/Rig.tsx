@@ -5,7 +5,7 @@ import {useFrame, useThree} from '@react-three/fiber';
 import {useCurrentFrame} from 'remotion';
 import {DepthOfFieldEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect} from 'postprocessing';
 import {N8AOPostPass} from 'n8ao';
-import {cameraAt} from './camera';
+import {cameraAt, viewOffsetY} from './camera';
 import {C} from '../lib/brand';
 
 /** Positions the camera, fog and post-processing for the current frame and renders. */
@@ -45,7 +45,7 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     cam.near = s.dist * 0.02;
     cam.far = s.dist * 40;
     // keep subjects below the caption band (top third); centred again for the end card
-    const offY = 0.085 * (1 - THREE.MathUtils.smoothstep(f, 740, 820));
+    const offY = viewOffsetY(f);
     cam.setViewOffset(size.width, size.height, 0, -size.height * offY, size.width, size.height);
     cam.updateProjectionMatrix();
     cam.updateMatrixWorld();
