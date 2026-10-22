@@ -121,8 +121,8 @@ export const T = {
   pol1Arrive: [292, 324],
   pol1Clamp: [318, 330],
   pol1Move: [330, 440],
-  pol2Arrive: [354, 384],
-  pol2Bump: 384,
+  pol2Arrive: [344, 372],
+  pol2Bump: 372,
 };
 
 export const LOOSE_MIN = -3;

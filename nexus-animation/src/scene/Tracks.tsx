@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo} from 'react';
+import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useCurrentFrame} from 'remotion';
 import {C} from '../lib/brand';
@@ -9,10 +10,10 @@ import {clay} from './materials';
 import {CellType, repCell, TYPE_COLOR, TYPES} from './Tissue';
 
 const N = 260;
-const WIDTH = 12;
-const AMP = 1.45;
+export const WIDTH = 12;
+export const AMP = 1.45;
 export const SLOT_Y = (i: number) => 12.9 - i * 1.75;
-const MERGED_Y = SLOT_Y(1.5);
+export const MERGED_Y = SLOT_Y(1.5);
 
 /** Peak positions: one shared (housekeeping) peak at 0.5, plus cell-type-specific peaks. */
 const PEAKS: Record<CellType, [number, number, number][]> = {
@@ -34,10 +35,15 @@ function profile(type: CellType) {
   return out;
 }
 const PROFILES = Object.fromEntries(TYPES.map((t) => [t, profile(t)])) as Record<CellType, Float32Array>;
-/** Bulk average of the four cell types, lightly smoothed. */
+/**
+ * Bulk average: the four profiles weighted by roughly how common each cell type is in brain
+ * tissue (microglia are a small minority), lightly smoothed. Shared peaks survive; cell-type
+ * peaks shrink in proportion to that cell type's share, so rare-cell signals nearly vanish.
+ */
+export const SHARE: Record<CellType, number> = {neuron: 0.42, astro: 0.24, oligo: 0.26, micro: 0.08};
 const AVERAGE = (() => {
   const avg = new Float32Array(N);
-  for (const t of TYPES) for (let i = 0; i < N; i++) avg[i] += PROFILES[t][i] / TYPES.length;
+  for (const t of TYPES) for (let i = 0; i < N; i++) avg[i] += PROFILES[t][i] * SHARE[t];
   const sm = new Float32Array(N);
   const k = 4;
   for (let i = 0; i < N; i++) {
@@ -95,7 +101,7 @@ function trackGeometry(values: Float32Array, reveal: number, y0: number, amp: nu
 }
 
 export const Tracks: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   const visible = f >= 566;
   const m = mergeAmount(f);
   const data = useMemo(() => {

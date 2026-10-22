@@ -1,4 +1,5 @@
 import React, {useMemo} from 'react';
+import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useCurrentFrame} from 'remotion';
 import {C} from '../lib/brand';
@@ -183,7 +184,7 @@ export const blendAmount = (f: number) => ramp(f, 640, 712, easeInOutCubic);
 const fadeOut = (f: number) => 1 - ramp(f, 752, 830, easeInOutCubic);
 
 export const Tissue: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   const cells = useMemo(getTissue, []);
   const cam = cameraAt(f);
   if (f < 380 || f > 840) return null;

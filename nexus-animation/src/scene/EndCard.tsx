@@ -1,4 +1,5 @@
 import React from 'react';
+import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useCurrentFrame} from 'remotion';
 import {C} from '../lib/brand';
@@ -10,7 +11,7 @@ const geo = new THREE.SphereGeometry(1, 64, 48);
 
 /** Large soft sand circle that drifts into the bottom-right of the final frame. */
 export const EndCard: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   const t = ramp(f, 756, 860, easeInOutCubic);
   if (t <= 0) return null;
   mat.opacity = t;

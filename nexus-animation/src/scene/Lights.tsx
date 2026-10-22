@@ -1,11 +1,12 @@
 import React from 'react';
+import {useStoryFrame} from '../lib/timeline';
 import {useThree} from '@react-three/fiber';
 import {useCurrentFrame} from 'remotion';
 import {cameraAt} from './camera';
 
 /** Soft, bright, diffuse studio lighting that travels with the camera. */
 export const Lights: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   useThree();
   const s = cameraAt(f);
   const d = s.dist;
@@ -16,6 +17,8 @@ export const Lights: React.FC = () => {
       <hemisphereLight args={['#ffffff', '#E9E4C6', 1.85]} />
       <directionalLight position={key} target-position={s.target} intensity={1.35} color="#fffaf2" />
       <directionalLight position={fill} target-position={s.target} intensity={0.45} color="#f4f1ec" />
+      {/* rim light from behind gives molecules a crisp edge against the bright background */}
+      <directionalLight position={s.target.clone().add(s.target.clone().sub(s.pos).multiplyScalar(1.2)).add({x: 0, y: 0.6 * d, z: 0} as never)} target-position={s.target} intensity={0.9} color="#ffffff" />
     </>
   );
 };

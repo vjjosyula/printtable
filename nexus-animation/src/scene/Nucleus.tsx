@@ -1,4 +1,5 @@
 import React, {useMemo} from 'react';
+import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useCurrentFrame} from 'remotion';
 import {C} from '../lib/brand';
@@ -104,7 +105,7 @@ const nucleolusGeo = (() => {
 })();
 
 export const Nucleus: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   if (!fibres) fibres = buildFibres();
   const fb = fibres;
   const beads = useMemo(() => {

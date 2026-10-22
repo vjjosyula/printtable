@@ -1,5 +1,6 @@
 import React from 'react';
-import {AbsoluteFill, useVideoConfig} from 'remotion';
+import {useStoryFrame} from './lib/timeline';
+import {AbsoluteFill, Audio, staticFile, useVideoConfig} from 'remotion';
 import {ThreeCanvas} from '@remotion/three';
 import * as THREE from 'three';
 import {C} from './lib/brand';
@@ -16,7 +17,7 @@ import {cameraAt} from './scene/camera';
 
 export const Main: React.FC = () => {
   const {width, height} = useVideoConfig();
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   const dist = cameraAt(f).dist;
   const detail = dist < 600;
   const showChromatin = dist < 9000;
@@ -42,6 +43,7 @@ export const Main: React.FC = () => {
         <Rig />
       </ThreeCanvas>
       <Overlay />
+      <Audio src={staticFile('soundtrack.wav')} />
     </AbsoluteFill>
   );
 };

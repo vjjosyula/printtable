@@ -1,44 +1,45 @@
 import React from 'react';
+import * as THREE from 'three';
 import {AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig, Easing, staticFile} from 'remotion';
 import {loadFont} from '@remotion/fonts';
 import {C} from './lib/brand';
+import {FPS, storyFrame, videoSecondsForStory} from './lib/timeline';
+import {cameraAt, NUCLEUS_CENTER, TISSUE_K} from './scene/camera';
+import {worldAt} from './scene/state';
+import {tailPoints} from './scene/tails';
+import {mergeAmount, SLOT_Y, WIDTH, MERGED_Y} from './scene/Tracks';
+import {TYPES} from './scene/Tissue';
+import {ramp} from './lib/math';
 
 // Red Hat Display (Google Fonts, variable weight), bundled locally for headless rendering.
 const fontFamily = 'Red Hat Display';
 loadFont({family: fontFamily, url: staticFile('RedHatDisplay-latin.woff2'), weight: '300 900'});
 
-/** On-screen captions. `key` marks the single blue keyword. */
-export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string}[] = [
-  {from: 12, to: 168, lines: ['Your DNA is wrapped', 'around histones.'], key: 'histones.'},
-  {from: 190, to: 282, lines: ['Marks decide which', 'genes are read.'], key: 'Marks'},
-  {from: 292, to: 386, lines: ['Open here.', 'Locked there.'], key: 'Open'},
-  {from: 404, to: 562, lines: ['Every cell type reads', 'different genes.'], key: 'different'},
-  {from: 600, to: 744, lines: ['Most profiling blends them', 'into one average.'], key: 'average.'},
+/** On-screen captions (video seconds). `key` is the single highlighted word. */
+export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string; keyColor?: string}[] = [
+  {from: 0.3, to: 4.6, lines: ['Every cell carries', 'the same DNA.'], key: 'same'},
+  {from: 4.9, to: 9.9, lines: ['Your DNA is wrapped', 'around histones.'], key: 'histones.'},
+  {from: 10.3, to: 16.6, lines: ['Marks on histones decide', 'which genes are read.'], key: 'Marks'},
+  {from: 17.0, to: 25.2, lines: ['H3K27ac opens', 'the DNA.'], key: 'H3K27ac'},
+  {from: 25.6, to: 31.0, lines: ['H3K27me3 locks', 'it shut.'], key: 'H3K27me3', keyColor: C.coral},
+  {from: 31.6, to: 41.6, lines: ['Every cell type reads', 'different genes.'], key: 'different'},
+  {from: 42.4, to: 49.6, lines: ['Most profiling blends a tissue', 'into one average.'], key: 'average.'},
+  {from: 50.0, to: 56.7, lines: ['Cell-type signals get diluted.', 'Rare cells nearly vanish.'], key: 'diluted.'},
 ];
 
-const fade = (f: number, a: number, b: number, d = 10) =>
-  interpolate(f, [a, a + d, b - d, b], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
+const fadeWin = (t: number, a: number, b: number, d = 0.35) =>
+  interpolate(t, [a, a + d, b - d, b], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
 
-const Caption: React.FC<{c: (typeof CAPTIONS)[number]; f: number; size: number}> = ({c, f, size}) => {
-  const o = fade(f, c.from, c.to);
+const Caption: React.FC<{c: (typeof CAPTIONS)[number]; t: number; size: number}> = ({c, t, size}) => {
+  const o = fadeWin(t, c.from, c.to);
   if (o <= 0) return null;
+  let wi = 0;
   return (
-    <div
-      style={{
-        position: 'absolute',
-        left: 80,
-        right: 80,
-        top: 120,
-        display: 'flex',
-        justifyContent: 'center',
-        opacity: o,
-        transform: `translateY(${(1 - o) * 14}px)`,
-      }}
-    >
+    <div style={{position: 'absolute', left: 80, right: 80, top: 116, display: 'flex', justifyContent: 'center', opacity: Math.min(1, o * 1.4)}}>
       <div
         style={{
           background: C.panel,
-          borderRadius: 28,
+          borderRadius: 30,
           padding: '22px 40px 26px',
           fontFamily,
           fontWeight: 700,
@@ -47,17 +48,23 @@ const Caption: React.FC<{c: (typeof CAPTIONS)[number]; f: number; size: number}>
           color: C.charcoal,
           textAlign: 'center',
           letterSpacing: -0.5,
-          boxShadow: '0 6px 30px rgba(63,68,74,0.08)',
+          boxShadow: '0 10px 40px rgba(63,68,74,0.10)',
+          transform: `scale(${0.94 + 0.06 * o})`,
         }}
       >
         {c.lines.map((l, i) => (
           <div key={i}>
-            {l.split(' ').map((w, j) => (
-              <span key={j} style={{color: w === c.key ? C.blue : C.charcoal}}>
-                {j ? ' ' : ''}
-                {w}
-              </span>
-            ))}
+            {l.split(' ').map((w, j) => {
+              // words pop in one after another
+              const k = wi++;
+              const p = interpolate(t, [c.from + k * 0.07, c.from + k * 0.07 + 0.3], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.back(1.6))});
+              const isKey = w === c.key;
+              return (
+                <span key={j} style={{display: 'inline-block', marginLeft: j ? '0.26em' : 0, opacity: p, transform: `translateY(${(1 - p) * 16}px)`, color: isKey ? c.keyColor ?? C.blue : C.charcoal, fontWeight: isKey ? 800 : 700}}>
+                  {w}
+                </span>
+              );
+            })}
           </div>
         ))}
       </div>
@@ -65,33 +72,168 @@ const Caption: React.FC<{c: (typeof CAPTIONS)[number]; f: number; size: number}>
   );
 };
 
-const EndLine: React.FC<{f: number; at: number; style: React.CSSProperties; children: React.ReactNode}> = ({f, at, style, children}) => {
-  const o = interpolate(f, [at, at + 18], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
+/* ---------------------------------------------------------------- 3D -> screen projection */
+function makeProjector(sf: number, w: number, h: number) {
+  const s = cameraAt(sf);
+  const cam = new THREE.PerspectiveCamera(s.fov, w / h, s.dist * 0.02, s.dist * 40);
+  cam.position.copy(s.pos);
+  cam.up.set(0, 1, 0);
+  cam.lookAt(s.target);
+  const offY = 0.085 * (1 - THREE.MathUtils.smoothstep(sf, 740, 820));
+  cam.setViewOffset(w, h, 0, -h * offY, w, h);
+  cam.updateProjectionMatrix();
+  cam.updateMatrixWorld();
+  return (p: THREE.Vector3) => {
+    const q = p.clone().project(cam);
+    return {x: ((q.x + 1) / 2) * w, y: ((1 - q.y) / 2) * h, behind: q.z > 1};
+  };
+}
+
+const Tag: React.FC<{x: number; y: number; color: string; title: string; sub: string; o: number; side?: 1 | -1; dy?: number}> = ({x, y, color, title, sub, o, side = 1, dy = -110}) => {
+  if (o <= 0.01) return null;
+  const dx = 70 * side;
+  const lx = Math.min(1080 - 340, Math.max(80 + 290 * (side < 0 ? 1 : 0), x + dx));
+  const ly = Math.min(1350 - 200, Math.max(430, y + dy));
+  return (
+    <>
+      <svg style={{position: 'absolute', left: 0, top: 0, overflow: 'visible', opacity: o}} width={1} height={1}>
+        <line x1={x} y1={y} x2={lx} y2={ly} stroke={color} strokeWidth={3} strokeLinecap="round" />
+        <circle cx={x} cy={y} r={7} fill="none" stroke={color} strokeWidth={3} />
+      </svg>
+      <div
+        style={{
+          position: 'absolute',
+          left: side > 0 ? lx : undefined,
+          right: side < 0 ? undefined : undefined,
+          top: ly - 34,
+          transform: `translateX(${side > 0 ? 0 : -100}%) scale(${0.85 + 0.15 * o})`,
+          transformOrigin: side > 0 ? 'left center' : 'right center',
+          opacity: o,
+          background: color,
+          color: '#FBF9F6',
+          borderRadius: 18,
+          padding: '8px 18px 10px',
+          fontFamily,
+          whiteSpace: 'nowrap',
+          boxShadow: '0 8px 24px rgba(63,68,74,0.18)',
+          ...(side < 0 ? {left: lx} : {}),
+        }}
+      >
+        <div style={{fontWeight: 800, fontSize: 42, letterSpacing: -0.3, lineHeight: 1.1}}>{title}</div>
+        <div style={{fontWeight: 600, fontSize: 27, opacity: 0.92, lineHeight: 1.2}}>{sub}</div>
+      </div>
+    </>
+  );
+};
+
+const clampToFrame = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+
+const MarkTags: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
+  const proj = makeProjector(sf, w, h);
+  const world = worldAt(sf);
+  const out: React.ReactNode[] = [];
+  // H3K27ac on nucleosome 4, from the moment it is placed until the camera leaves the open region
+  const oAc = ramp(sf, 232, 246, (x) => x) * (1 - ramp(sf, 330, 342, (x) => x));
+  if (oAc > 0) {
+    const n4 = world.nucs.find((n) => n.id === 4)!;
+    const pts = tailPoints(n4, n4.tails[0], sf);
+    const k = pts.length / 3 - 1;
+    const p = proj(new THREE.Vector3(pts[3 * k], pts[3 * k + 1], pts[3 * k + 2]));
+    if (!p.behind) {
+      const side = p.x > w * 0.55 ? -1 : 1;
+      out.push(<Tag key="ac" x={p.x} y={p.y} color={C.blue} title="H3K27ac" sub="active mark · DNA opens" o={oAc} side={side as 1 | -1} dy={-150} />);
+    }
+  }
+  // H3K27me3 on the compact coil: tag the most visible coral mark
+  const oMe = ramp(sf, 356, 366, (x) => x) * (1 - ramp(sf, 404, 414, (x) => x));
+  if (oMe > 0) {
+    let best: {x: number; y: number; d: number} | null = null;
+    const cam = cameraAt(sf);
+    for (const n of world.nucs) {
+      if (!n.coil) continue;
+      const t = n.tails[0];
+      if (!t.mark) continue;
+      const pts = tailPoints(n, t, sf);
+      const k = pts.length / 3 - 1;
+      const wp = new THREE.Vector3(pts[3 * k], pts[3 * k + 1], pts[3 * k + 2]);
+      const p = proj(wp);
+      if (p.behind || p.x < w * 0.25 || p.x > w * 0.8 || p.y < h * 0.4 || p.y > h * 0.85) continue;
+      const d = wp.distanceTo(cam.pos);
+      // prefer marks on the camera side, above the polymerase
+      const score = d + Math.abs(p.y - h * 0.48) * 0.05;
+      if (!best || score < best.d) best = {x: p.x, y: p.y, d: score};
+    }
+    if (best) out.push(<Tag key="me3" x={best.x} y={best.y} color={C.coral} title="H3K27me3" sub="repressive mark · DNA locked" o={oMe} side={best.x > w * 0.5 ? -1 : 1} dy={-120} />);
+  }
+  return <>{out}</>;
+};
+
+const TYPE_LABEL: Record<string, string> = {neuron: 'Neurons', astro: 'Astrocytes', oligo: 'Oligodendrocytes', micro: 'Microglia'};
+const TYPE_TEXT: Record<string, string> = {neuron: C.blue, astro: C.teal, oligo: C.charcoal, micro: C.coral};
+
+const TrackLabels: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
+  const proj = makeProjector(sf, w, h);
+  const m = mergeAmount(sf);
+  const square = h < 1200;
+  const nodes: React.ReactNode[] = [];
+  TYPES.forEach((t, i) => {
+    const o = ramp(sf, 618 + i * 10, 640 + i * 10, (x) => x) * (1 - Math.min(1, m * 3));
+    if (o <= 0) return;
+    const y = SLOT_Y(i);
+    const p = proj(new THREE.Vector3(-WIDTH / 2, y, 0).multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
+    nodes.push(
+      <div key={t} style={{position: 'absolute', left: clampToFrame(p.x, 80, w - 300), top: p.y - (square ? 34 : 40), opacity: o, fontFamily, fontWeight: 700, fontSize: square ? 22 : 26, color: TYPE_TEXT[t], letterSpacing: 0.2}}>
+        {TYPE_LABEL[t]}
+      </div>,
+    );
+  });
+  const oAvg = Math.max(0, (m - 0.6) / 0.4);
+  if (oAvg > 0) {
+    const p = proj(new THREE.Vector3(-WIDTH / 2, MERGED_Y, 0).multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
+    nodes.push(
+      <div key="avg" style={{position: 'absolute', left: clampToFrame(p.x, 80, w - 300), top: p.y - 92, opacity: oAvg, fontFamily, fontWeight: 700, fontSize: square ? 28 : 32, color: C.grey}}>
+        Bulk tissue average
+      </div>,
+    );
+  }
+  return <>{nodes}</>;
+};
+
+const EndLine: React.FC<{t: number; at: number; style: React.CSSProperties; children: React.ReactNode}> = ({t, at, style, children}) => {
+  const o = interpolate(t, [at, at + 0.6], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.cubic)});
   return <div style={{opacity: o, transform: `translateY(${(1 - o) * 18}px)`, ...style}}>{children}</div>;
 };
 
 export const Overlay: React.FC = () => {
   const f = useCurrentFrame();
-  const {height} = useVideoConfig();
+  const t = f / FPS;
+  const sf = storyFrame(f);
+  const {width, height} = useVideoConfig();
   const square = height < 1200;
+  const endStart = videoSecondsForStory(786);
   return (
     <AbsoluteFill style={{pointerEvents: 'none'}}>
+      <MarkTags sf={sf} w={width} h={height} />
+      {sf > 600 && sf < 800 ? <TrackLabels sf={sf} w={width} h={height} /> : null}
       {CAPTIONS.map((c, i) => (
-        <Caption key={i} c={c} f={f} size={square ? 54 : 60} />
+        <Caption key={i} c={c} t={t} size={square ? 54 : 60} />
       ))}
-      {f >= 790 ? (
+      {t >= endStart ? (
         <div style={{position: 'absolute', left: 80, right: 80, bottom: 80, fontFamily, color: C.charcoal}}>
-          <EndLine f={f} at={792} style={{fontWeight: 800, fontSize: square ? 70 : 84, letterSpacing: -1, lineHeight: 1.05}}>
+          <EndLine t={t} at={57.6} style={{fontWeight: 800, fontSize: square ? 70 : 84, letterSpacing: -1, lineHeight: 1.05}}>
             NEXUS Epigenomics
           </EndLine>
-          <EndLine f={f} at={812} style={{fontWeight: 500, fontSize: square ? 38 : 46, marginTop: square ? 14 : 22, lineHeight: 1.25}}>
+          <EndLine t={t} at={60.4} style={{fontWeight: 500, fontSize: square ? 38 : 46, marginTop: square ? 14 : 22, lineHeight: 1.25}}>
             Founded in Stockholm, 2024.
           </EndLine>
-          <EndLine f={f} at={830} style={{fontWeight: 500, fontSize: square ? 38 : 46, marginTop: 8, lineHeight: 1.25, maxWidth: 820}}>
+          <EndLine t={t} at={63.0} style={{fontWeight: 500, fontSize: square ? 38 : 46, marginTop: 8, lineHeight: 1.25, maxWidth: 820}}>
             Kits built on methods published in Nature Biotechnology.
           </EndLine>
-          <EndLine f={f} at={858} style={{fontWeight: 800, fontSize: square ? 56 : 68, marginTop: square ? 22 : 40, letterSpacing: -0.5, lineHeight: 1.1}}>
+          <EndLine t={t} at={67.2} style={{fontWeight: 800, fontSize: square ? 56 : 68, marginTop: square ? 20 : 34, letterSpacing: -0.5, lineHeight: 1.1}}>
             What is your biggest gap?
+          </EndLine>
+          <EndLine t={t} at={67.4} style={{fontWeight: 600, fontSize: square ? 28 : 32, marginTop: 10, color: C.blue}}>
+            Tell us in the comments.
           </EndLine>
         </div>
       ) : null}

@@ -1,0 +1,79 @@
+[
+ {
+  "start": 0.4,
+  "say": "Every cell in your body carries the same DNA.",
+  "show": "Every cell in your body carries the same DNA."
+ },
+ {
+  "start": 3.6,
+  "say": "About two metres of it, wrapped around proteins called histones, like thread on spools.",
+  "show": "About two metres of it, wrapped around proteins called histones, like thread on spools."
+ },
+ {
+  "start": 10.2,
+  "say": "Small chemical marks on histone tails decide which genes are read.",
+  "show": "Small chemical marks on histone tails decide which genes are read."
+ },
+ {
+  "start": 14.3,
+  "say": "Here, an enzyme adds an activating mark, H3 K27 acetylation.",
+  "show": "Here, an enzyme adds an activating mark, H3K27ac."
+ },
+ {
+  "start": 19.8,
+  "say": "The nucleosomes slide apart, so polymerase can read the gene.",
+  "show": "The nucleosomes slide apart, so polymerase can read the gene."
+ },
+ {
+  "start": 24.2,
+  "say": "Elsewhere, H3 K27 tri-methylation packs the DNA tightly.",
+  "show": "Elsewhere, H3K27me3 packs the DNA tightly."
+ },
+ {
+  "start": 29.3,
+  "say": "The polymerase can't get in. The gene stays silent.",
+  "show": "The polymerase can't get in. The gene stays silent."
+ },
+ {
+  "start": 32.5,
+  "say": "Zoom out, and every cell type has its own pattern of marks.",
+  "show": "Zoom out, and every cell type has its own pattern of marks."
+ },
+ {
+  "start": 36.0,
+  "say": "Neurons, astrocytes, oligodendrocytes and microglia each read different genes.",
+  "show": "Neurons, astrocytes, oligodendrocytes and microglia each read different genes."
+ },
+ {
+  "start": 42.4,
+  "say": "But most epigenome profiling grinds the whole tissue together.",
+  "show": "But most epigenome profiling grinds the whole tissue together."
+ },
+ {
+  "start": 47.4,
+  "say": "Every cell type's signal is diluted into one average.",
+  "show": "Every cell type's signal is diluted into one average."
+ },
+ {
+  "start": 51.6,
+  "say": "Peaks unique to one cell type shrink, and rare cells like microglia nearly disappear.",
+  "show": "Peaks unique to one cell type shrink, and rare cells like microglia nearly disappear."
+ },
+ {
+  "start": 57.4,
+  "say": "NEXUS Epigenomics was founded in Stockholm in 2024 to close that gap,",
+  "show": "NEXUS Epigenomics was founded in Stockholm in 2024 to close that gap,",
+  "speed": 1.1
+ },
+ {
+  "start": 62.9,
+  "say": "with ready-to-use kits built on methods published in Nature Biotechnology.",
+  "show": "with ready-to-use kits built on methods published in Nature Biotechnology.",
+  "speed": 1.1
+ },
+ {
+  "start": 67.4,
+  "say": "What is your biggest gap?",
+  "show": "What is your biggest gap?"
+ }
+]

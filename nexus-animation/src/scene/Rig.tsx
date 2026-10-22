@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo} from 'react';
+import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useFrame, useThree} from '@react-three/fiber';
 import {useCurrentFrame} from 'remotion';
@@ -9,7 +10,7 @@ import {C} from '../lib/brand';
 
 /** Positions the camera, fog and post-processing for the current frame and renders. */
 export const Rig: React.FC<{dofScale?: number}> = () => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   const {gl, scene, camera, size} = useThree();
   const cam = camera as THREE.PerspectiveCamera;
 

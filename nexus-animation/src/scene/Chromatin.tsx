@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo} from 'react';
+import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useCurrentFrame} from 'remotion';
 import {coreToWorld, doubleHelix, G} from '../lib/chromatin';
@@ -25,7 +26,7 @@ function useDisposable<T extends {dispose: () => void}>(make: () => T, deps: unk
 }
 
 export const Chromatin: React.FC<{detail: boolean; opacity?: number; clip?: THREE.Plane[]}> = ({detail}) => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   const w = worldAt(f);
 
   const helix = useMemo(() => {
@@ -170,7 +171,7 @@ function mergeTubes(geos: THREE.BufferGeometry[]) {
 }
 
 const Writer: React.FC = () => {
-  const f = useCurrentFrame();
+  const f = useStoryFrame();
   const w = worldAt(f).writer;
   if (w.visible <= 0) return null;
   return <mesh geometry={writerGeometry()} material={M.writer} position={w.pos} quaternion={w.quat} scale={0.8 * (0.6 + 0.4 * w.visible)} />;
