@@ -1,0 +1,21 @@
+{
+  "name": "nexus-animation",
+  "private": true,
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "@react-three/fiber": "^9.2.0",
+    "@react-three/postprocessing": "^3.0.4",
+    "@remotion/bundler": "^4.0.537",
+    "@remotion/cli": "^4.0.537",
+    "@remotion/fonts": "^4.0.537",
+    "@remotion/google-fonts": "^4.0.537",
+    "@remotion/renderer": "^4.0.537",
+    "@remotion/three": "^4.0.537",
+    "postprocessing": "^6.37.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "remotion": "^4.0.537",
+    "three": "^0.178.0"
+  }
+}
