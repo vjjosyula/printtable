@@ -53,7 +53,10 @@ export function worldAt(f: number): World {
   const n5 = byId(nucs, 5);
   const dock = (n: Nuc) => {
     const {tip, dir} = tailTip(n, n.tails[0], f);
-    return {pos: tip.clone().addScaledVector(dir, 4.6), dir};
+    // dock beside the tail tip (offset upwards) so the new mark stays visible
+    const up = new THREE.Vector3(0, 1, 0.35).normalize();
+    const pos = tip.clone().addScaledVector(dir, 2.0).addScaledVector(up, 4.6);
+    return {pos, dir: pos.clone().sub(tip).normalize()};
   };
   const d4 = dock(n4);
   const d5 = dock(n5);

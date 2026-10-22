@@ -59,6 +59,16 @@ const POL_BODY: SDF = (x, y, z) => {
   d = smin(d, sdSphere(-3.5, 7.5, 3.0, 5.2)(x, y, z), 2.5);
   d = smin(d, sdSphere(4.0, 6.0, -3.5, 5.0)(x, y, z), 2.5);
   d = smin(d, sdSphere(1.0, -1.5, 5.2, 4.2)(x, y, z), 2.0);
+  // extra domains so the enzyme reads as a multi-subunit machine, not a smooth blob
+  d = smin(d, sdSphere(-8.5, 8.5, -1.5, 3.4)(x, y, z), 1.2); // stalk
+  d = smin(d, sdSphere(-10.5, 10.5, -2.5, 2.4)(x, y, z), 1.0);
+  d = smin(d, sdSphere(8.0, -0.5, 4.5, 3.6)(x, y, z), 1.2); // jaw
+  d = smin(d, sdSphere(6.5, 10.0, 3.0, 3.8)(x, y, z), 1.4);
+  d = smin(d, sdSphere(-2.0, 12.0, -2.0, 3.2)(x, y, z), 1.4);
+  // shallow surface grooves between subunits
+  d = smax(d, -sdSphere(2.0, 7.5, 9.6, 2.2)(x, y, z), 0.8);
+  d = smax(d, -sdSphere(-6.0, 4.0, 9.0, 2.0)(x, y, z), 0.8);
+  d += 0.25 * Math.sin(x * 0.9) * Math.sin(y * 0.8 + 1) * Math.sin(z * 0.85 + 2);
   // DNA channel
   const chan = Math.hypot(y, z) - 2.2;
   d = smax(d, -chan, 0.7);

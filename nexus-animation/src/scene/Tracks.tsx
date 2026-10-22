@@ -85,7 +85,7 @@ function trackGeometry(values: Float32Array, reveal: number, y0: number, amp: nu
     pts[3 * k + 2] = pz;
     fillPos.push(px, lerp(from ? from.y : y0, y0, rise), pz, px, py, pz);
   }
-  const line = tubeGeometry(pts, 0.055, 6);
+  const line = tubeGeometry(pts, 0.065, 6);
   const fill = new THREE.BufferGeometry();
   fill.setAttribute('position', new THREE.Float32BufferAttribute(fillPos, 3));
   const idx: number[] = [];
@@ -110,7 +110,7 @@ export const Tracks: React.FC = () => {
       const cell = repCell(t);
       const from = rise < 1 ? cell.pos.clone().add(new THREE.Vector3(0, 0.6, 0)) : null;
       const g = trackGeometry(vals, reveal, y, AMP, from, rise);
-      return {t, appear, ...g, edge: t === 'oligo' ? tubeGeometry(g.pts, 0.07, 6) : null};
+      return {t, appear, ...g, edge: t === 'oligo' ? tubeGeometry(g.pts, 0.078, 6) : null};
     });
   }, [f, visible, m]);
   useEffect(
@@ -132,7 +132,7 @@ export const Tracks: React.FC = () => {
     mats[t].color.set(TYPE_COLOR[t]).lerp(greyC, m);
     fills[t].color.set(TYPE_COLOR[t]).lerp(greyC, m);
     // the sand oligodendrocyte track would vanish on the light background, so it is drawn darker-edged
-    fills[t].opacity = 0.22;
+    fills[t].opacity = t === 'oligo' ? 0.55 : 0.22;
   });
   return (
     <group position={NUCLEUS_CENTER} scale={TISSUE_K}>
