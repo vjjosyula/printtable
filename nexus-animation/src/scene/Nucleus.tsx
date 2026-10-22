@@ -144,7 +144,7 @@ export const Nucleus: React.FC = () => {
   clipPlane.set(n.clone().negate(), n.dot(P0));
   // nucleus takes on the neuron colour once seen from outside the cell
   const out = smoothstep(Math.log(5000), Math.log(20000), Math.log(cam.dist));
-  envMat.color.set(C.haze).lerp(new THREE.Color(C.magenta), out);
+  envMat.color.set(C.haze).lerp(new THREE.Color('#A3306F'), out);
   const pulse = 1 + 0.035 * Math.sin((f - 400) * 0.16) * out;
   const visible = cam.dist < 60 ? false : true;
   return (

@@ -16,7 +16,7 @@ let origin: THREE.Vector3 | null = null;
 export function gapOrigin() {
   if (!origin) {
     const c = repCell('neuron');
-    const off = new THREE.Vector3(c.nucleusOff.x, c.nucleusOff.y + 0.5, c.nucleusOff.z).applyAxisAngle(new THREE.Vector3(0, 1, 0), c.rot);
+    const off = new THREE.Vector3(c.nucleusOff.x, c.nucleusOff.y, c.nucleusOff.z).applyAxisAngle(new THREE.Vector3(0, 1, 0), c.rot);
     origin = c.pos.clone().add(off).multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER);
   }
   return origin;
