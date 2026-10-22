@@ -81,8 +81,3 @@ sample, in bulk or in single cells.
 00:01:20,700 --> 00:01:25,204
 MeTLAND maps DNA methylation
 without bisulfite or antibodies.
-
-18
-00:01:25,600 --> 00:01:29,361
-Want to know more? Read the paper. We'll
-drop the link in the comments.
