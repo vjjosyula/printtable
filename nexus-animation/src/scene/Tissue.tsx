@@ -5,12 +5,13 @@ import {useCurrentFrame} from 'remotion';
 import {C} from '../lib/brand';
 import {tubeGeometry} from '../lib/geom';
 import {clamp, mulberry32, ramp, smoothstep, easeInOutCubic} from '../lib/math';
-import {cameraAt, NUCLEUS_CENTER, TISSUE_K} from './camera';
+import {NUCLEUS_CENTER, TISSUE_K} from './camera';
+import {viewAt} from './view';
 import {clay} from './materials';
 import {MergeHelper} from './Chromatin';
 
 export type CellType = 'neuron' | 'astro' | 'oligo' | 'micro';
-export const TYPE_COLOR: Record<CellType, string> = {neuron: C.blue, astro: C.teal, oligo: C.sand, micro: C.coral};
+export const TYPE_COLOR: Record<CellType, string> = {neuron: C.magenta, astro: C.tealLight, oligo: C.sand, micro: C.coral};
 export const TYPES: CellType[] = ['neuron', 'astro', 'oligo', 'micro'];
 
 type Cell = {type: CellType; pos: THREE.Vector3; rot: number; geo: THREE.BufferGeometry; accent?: THREE.BufferGeometry | null; outline?: THREE.BufferGeometry; nucleusR: number; nucleusOff: THREE.Vector3; phase: number};
@@ -56,6 +57,53 @@ function branch(
   }
 }
 
+/**
+ * Dichotomous dendritic tree: each segment runs nearly straight, tapers, then forks in two,
+ * so the arbor ends in many fine tips (how real dendrites look, rather than one long wavy tube).
+ */
+function dendrite(
+  rnd: () => number,
+  out: THREE.BufferGeometry[],
+  start: THREE.Vector3,
+  dir: THREE.Vector3,
+  len: number,
+  r0: number,
+  depth: number,
+  angle: number,
+  flat: number,
+  pad: number,
+  tips?: THREE.Vector3[],
+) {
+  const n = 8;
+  const pts: number[] = [];
+  const p = start.clone();
+  const d = dir.clone();
+  for (let k = 0; k < n; k++) {
+    pts.push(p.x, p.y, p.z);
+    d.x += (rnd() - 0.5) * 0.12;
+    d.y += (rnd() - 0.5) * 0.12 * flat;
+    d.z += (rnd() - 0.5) * 0.12;
+    d.normalize();
+    p.addScaledVector(d, len / (n - 1));
+  }
+  const r1 = Math.max(0.018, r0 * 0.7);
+  out.push(tubeGeometry(pts, (u) => r0 + (r1 - r0) * u + pad, r0 > 0.06 ? 10 : 7));
+  if (depth <= 0) {
+    tips?.push(p.clone());
+    return;
+  }
+  // a small round joint hides the seam where the branch forks
+  out.push(new THREE.SphereGeometry(r1 * 1.08 + pad, 10, 8).translate(p.x, p.y, p.z));
+  // fork: rotate the heading both ways around a random axis perpendicular to it
+  const helper = Math.abs(d.y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+  const axis = new THREE.Vector3().crossVectors(d, helper).normalize().applyAxisAngle(d, (rnd() - 0.5) * Math.PI * (1 - flat * 0.6));
+  for (const sgn of [-1, 1]) {
+    const a = sgn * angle * (0.75 + 0.5 * rnd());
+    const nd = d.clone().applyAxisAngle(axis, a).normalize();
+    dendrite(rnd, out, p.clone(), nd, len * (0.72 + 0.2 * rnd()), r1, depth - 1, angle, flat, pad, tips);
+  }
+}
+
 function makeCell(type: CellType, seed: number, outlinePad = 0): {geo: THREE.BufferGeometry; nucleusR: number; nucleusOff: THREE.Vector3; accent: THREE.BufferGeometry | null} {
   const rnd = mulberry32(seed);
   const parts: THREE.BufferGeometry[] = [];
@@ -76,74 +124,71 @@ function makeCell(type: CellType, seed: number, outlinePad = 0): {geo: THREE.Buf
     }
   };
   if (type === 'neuron') {
-    // Pyramidal neuron: teardrop soma, one thick apical dendrite (along -z, so neighbours line up like a
-    // cortical layer) ending in a tuft, oblique branches, a skirt of basal dendrites with spines, and a long axon.
-    const apical = new THREE.Vector3(0, 0.05, -1).normalize();
-    parts.push(somaGeo(0.85, 1.0, 0.8, 1.0));
-    parts.push(tubeGeometry([0, 0, -0.3, 0, 0.02, -0.9, 0, 0.04, -1.45], (u) => 0.72 - 0.38 * u, 16));
-    nucleusR = 0.353;
+    // Pyramidal neuron: small tapered soma, one long apical dendrite (along -z, so neighbours line up like a
+    // cortical layer) ending in a branching tuft, basal dendrite trees that fork again and again into fine tips,
+    // and a thin, nearly straight axon with a small terminal arbor.
+    parts.push(somaGeo(0.72, 1.0, 0.82, 1.0));
+    // the soma tapers smoothly into the apical shaft and into the axon hillock
+    parts.push(tubeGeometry([0, 0, -0.35, 0, 0.02, -0.9, 0, 0.03, -1.4], (u) => 0.55 - 0.36 * u + outlinePad, 16));
+    parts.push(tubeGeometry([0, -0.03, 0.4, 0, -0.04, 0.85, 0, -0.05, 1.1], (u) => 0.4 - 0.33 * u + outlinePad, 12));
+    nucleusR = 0.34;
+    const tree = (start: THREE.Vector3, dir: THREE.Vector3, len: number, r0: number, depth: number, angle: number, flat = 0.6) =>
+      dendrite(rnd, parts, start, dir, len, r0, depth, angle, flat, outlinePad);
+    // apical shaft: long, tapering, almost straight, with oblique dendrites that fork
     const apicalPts: THREE.Vector3[] = [];
     {
       const pts: number[] = [];
-      const p = new THREE.Vector3(0, 0.04, -1.4);
-      const d = apical.clone();
-      for (let k = 0; k < 26; k++) {
+      const p = new THREE.Vector3(0, 0.03, -1.35);
+      const d = new THREE.Vector3(0, 0.03, -1).normalize();
+      for (let k = 0; k < 30; k++) {
         pts.push(p.x, p.y, p.z);
         apicalPts.push(p.clone());
-        d.x += (rnd() - 0.5) * 0.08;
+        d.x += (rnd() - 0.5) * 0.03;
         d.normalize();
-        p.addScaledVector(d, 5.2 / 25);
+        p.addScaledVector(d, 5.6 / 29);
       }
-      parts.push(tubeGeometry(pts, (u) => 0.34 - 0.2 * u + outlinePad, 12));
+      parts.push(tubeGeometry(pts, (u) => 0.19 - 0.1 * u + outlinePad, 10));
     }
-    // apical tuft
+    for (const at of [7, 12, 17, 22]) {
+      const side = at % 2 ? -1 : 1;
+      const d = new THREE.Vector3(side * (0.8 + rnd() * 0.3), (rnd() - 0.5) * 0.5, -0.55).normalize();
+      tree(apicalPts[at], d, 0.9 + rnd() * 0.4, 0.07, 2, 0.45);
+    }
+    // apical tuft: the shaft splits into a fan of forking branches
     const top = apicalPts[apicalPts.length - 1];
     for (let i = 0; i < 3; i++) {
-      const a = -0.8 + (i / 2) * 1.6 + (rnd() - 0.5) * 0.3;
-      const d = new THREE.Vector3(Math.sin(a), 0.1 * (rnd() - 0.5), -Math.cos(a)).normalize();
-      branch(rnd, parts, top, d, 1.6 + rnd() * 0.8, 0.13, 1, {children: [1, 1], lenFactor: 0.6, spread: 0.8, wiggle: 0.12, flat: 0.5, rFactor: 0.55}, outlinePad);
+      const a = -0.75 + (i / 2) * 1.5 + (rnd() - 0.5) * 0.2;
+      const d = new THREE.Vector3(Math.sin(a), 0.25 * (rnd() - 0.5), -Math.cos(a)).normalize();
+      tree(top, d, 0.9 + rnd() * 0.3, 0.085, 3, 0.42);
     }
-    // oblique branches off the apical shaft
-    for (const at of [10, 17]) {
-      const side = rnd() < 0.5 ? -1 : 1;
-      const d = new THREE.Vector3(side, 0, -0.5 - rnd() * 0.3).normalize();
-      branch(rnd, parts, apicalPts[at], d, 1.2 + rnd() * 0.6, 0.1, 0, {children: [0, 0], lenFactor: 0, spread: 0, wiggle: 0.12, flat: 0.4, rFactor: 0.5}, outlinePad);
+    // basal dendrites: a skirt of trees from the base of the soma
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI * (0.1 + (0.8 * i) / 5) + (rnd() - 0.5) * 0.2;
+      const d = new THREE.Vector3(Math.cos(a), (rnd() - 0.5) * 0.7, Math.sin(a) * 0.9 + 0.25).normalize();
+      tree(d.clone().multiplyScalar(0.6), d, 0.75 + rnd() * 0.3, 0.1, 3, 0.48);
     }
-    // basal dendrites fan out from the base of the soma
-    for (let i = 0; i < 4; i++) {
-      const a = Math.PI * (0.2 + (0.6 * i) / 3) + (rnd() - 0.5) * 0.2;
-      const d = new THREE.Vector3(Math.cos(a), (rnd() - 0.5) * 0.6, Math.sin(a)).normalize();
-      branch(rnd, parts, d.clone().multiplyScalar(0.7), d, 2.2 + rnd() * 1.0, 0.2, 1, {children: [1, 2], lenFactor: 0.65, spread: 0.9, wiggle: 0.12, flat: 0.6, rFactor: 0.45}, outlinePad);
-    }
-    // axon from the base, with two collaterals
+    // axon: thin and straight, two collaterals and a terminal arbor with boutons
     {
       const pts: number[] = [];
-      const p = new THREE.Vector3(0, -0.05, 0.75);
-      const d = new THREE.Vector3((rnd() - 0.5) * 0.3, -0.03, 1).normalize();
-      const branchPts: THREE.Vector3[] = axonPts;
+      const p = new THREE.Vector3(0, -0.05, 1.05);
+      const d = new THREE.Vector3((rnd() - 0.5) * 0.2, -0.04, 1).normalize();
       for (let k = 0; k < 40; k++) {
         pts.push(p.x, p.y, p.z);
-        branchPts.push(p.clone());
-        d.x += (rnd() - 0.5) * 0.06;
+        axonPts.push(p.clone());
+        d.x += (rnd() - 0.5) * 0.02;
         d.normalize();
-        p.addScaledVector(d, 0.24);
+        p.addScaledVector(d, 0.22);
       }
-      parts.push(tubeGeometry(pts, (u) => (u < 0.06 ? 0.16 - u : 0.075) + outlinePad, 10));
-      for (const at of [14, 27]) {
-        const side = rnd() < 0.5 ? -1 : 1;
-        branch(rnd, parts, branchPts[at], new THREE.Vector3(side, 0, 0.6).normalize(), 2.0 + rnd(), 0.05, 0, {children: [0, 0], lenFactor: 0, spread: 0, wiggle: 0.25, flat: 0.2, rFactor: 0.8}, outlinePad);
+      parts.push(tubeGeometry(pts, 0.05 + outlinePad, 8));
+      for (const at of [15, 26]) {
+        const side = at === 15 ? -1 : 1;
+        tree(axonPts[at], new THREE.Vector3(side, 0, 0.9).normalize(), 0.9, 0.035, 1, 0.5, 0.3);
       }
-    }
-    // coral bands along the axon (nodes between myelinated stretches), echoing the reference highlights
-    if (!outlinePad) {
-      const ax = axonPts;
-      for (let k = 6; k < ax.length - 2; k += 6) {
-        const t = ax[k + 1].clone().sub(ax[k - 1]).normalize();
-        const g = new THREE.TorusGeometry(0.11, 0.05, 8, 18);
-        g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), t));
-        g.translate(ax[k].x, ax[k].y, ax[k].z);
-        accents.push(g);
-      }
+      const end = axonPts[axonPts.length - 1];
+      const tips: THREE.Vector3[] = [];
+      dendrite(rnd, parts, end, d.clone(), 0.55, 0.045, 3, 0.55, 0.5, outlinePad, tips);
+      // boutons at the axon terminals
+      if (!outlinePad) for (const tp of tips) accents.push(new THREE.SphereGeometry(0.07, 12, 8).translate(tp.x, tp.y, tp.z));
     }
   } else if (type === 'astro') {
     parts.push(somaGeo(0.6));
@@ -238,25 +283,25 @@ export function repCell(type: CellType) {
 // Solid (opaque) cells so they shade and cast ambient occlusion like real 3D objects.
 // Bodies are a lighter tint of the type colour; the nucleus bulges out in the full colour.
 /** Light denim blue for neurons (a lighter, cleaner relative of the brand blue). */
-const NEURON_BLUE = '#7FB0E6';
+const NEURON_BLUE = C.magenta;
 const bodyMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
-  neuron: clay(NEURON_BLUE, {roughness: 0.32, clearcoat: 0.7, clearcoatRoughness: 0.25, emissive: new THREE.Color(C.blue), emissiveIntensity: 0.35}),
-  astro: clay(C.teal),
-  oligo: clay(C.sand),
-  micro: clay(C.coral),
+  neuron: clay(NEURON_BLUE, {roughness: 0.5, clearcoat: 0.25, clearcoatRoughness: 0.5, emissive: new THREE.Color(C.magenta), emissiveIntensity: 0.18}),
+  astro: clay(C.tealLight),
+  oligo: clay('#BDB79A'),
+  micro: clay('#A84A36'),
 };
-const accentMat = clay(C.coral, {roughness: 0.4});
-const BODY_TINT: Record<CellType, number> = {neuron: 0, astro: 0.2, oligo: 0, micro: 0.18};
+const accentMat = clay('#F07CBC', {roughness: 0.4});
+const BODY_TINT: Record<CellType, number> = {neuron: 0, astro: 0, oligo: 0, micro: 0};
 const NUC_LIFT: Record<CellType, number> = {neuron: 0.5, astro: 0.42, oligo: 0.36, micro: 0.2};
 const offWhite = new THREE.Color(C.bg);
 const nucMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
-  neuron: clay(C.blue),
-  astro: clay(C.teal),
+  neuron: clay('#B0307A'),
+  astro: clay('#1F7E72'),
   oligo: clay(C.sand),
   micro: clay(C.coral),
 };
-const outlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true});
-const nucOutlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true});
+const outlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true, visible: false});
+const nucOutlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true, visible: false});
 const sphere = new THREE.SphereGeometry(1, 32, 24);
 // cells merge towards a soft light blue (the grey is kept for the averaged signal track only)
 const grey = new THREE.Color(C.blue).lerp(new THREE.Color(C.bg), 0.55);
@@ -267,9 +312,10 @@ const fadeOut = (f: number) => 1 - ramp(f, 752, 830, easeInOutCubic);
 
 export const Tissue: React.FC = () => {
   const f = useStoryFrame();
+  const vf = useCurrentFrame();
   const cells = useMemo(getTissue, []);
-  const cam = cameraAt(f);
-  if (f < 380 || f > 840) return null;
+  const cam = viewAt(vf);
+  if (f < 380 || f > 840 || cam.dist < 3000) return null;
   const blend = blendAmount(f);
   // surrounding cells fade in as the camera pulls back past them (no giant processes in front of the lens)
   const fade = fadeOut(f) * smoothstep(Math.log(5000), Math.log(13000), Math.log(cam.dist) + (f > 600 ? 99 : 0));
@@ -287,7 +333,7 @@ export const Tissue: React.FC = () => {
   outlineMat.opacity = fade * (1 - blend * 0.6);
   accentMat.transparent = fade < 1;
   accentMat.opacity = fade;
-  accentMat.color.set(C.coral).lerp(grey, blend);
+  accentMat.color.set('#F07CBC').lerp(grey, blend);
   nucOutlineMat.opacity = fade * (1 - blend * 0.6);
   const swirlT = (f - 640) / 30;
   return (

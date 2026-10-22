@@ -9,10 +9,9 @@ import {Lights} from './scene/Lights';
 import {Chromatin} from './scene/Chromatin';
 import {Nucleus} from './scene/Nucleus';
 import {Tissue} from './scene/Tissue';
-import {Tracks} from './scene/Tracks';
-import {TechScene} from './scene/TechScene';
-import {Backdrop} from './scene/Backdrop';
-import {brandBackground, darkAmount} from './scene/background';
+import {GapStage} from './scene/GapStage';
+import {GAP_T0} from './scene/view';
+import {brandBackground} from './scene/background';
 import {Overlay} from './Overlay';
 import {useCurrentFrame} from 'remotion';
 import {cameraAt} from './scene/camera';
@@ -20,9 +19,10 @@ import {cameraAt} from './scene/camera';
 export const Main: React.FC = () => {
   const {width, height} = useVideoConfig();
   const f = useStoryFrame();
+  const t = useCurrentFrame() / 30;
   const dist = cameraAt(f).dist;
   const detail = dist < 600;
-  const showChromatin = dist < 9000 && f < 700;
+  const showChromatin = dist < 9000 && f < 700 && t < GAP_T0;
   return (
     <AbsoluteFill style={{background: C.bg}}>
       <ThreeCanvas
@@ -35,14 +35,12 @@ export const Main: React.FC = () => {
         }}
       >
         <primitive attach="background" object={brandBackground(width, height)} />
-        {darkAmount(f) > 0 ? <Backdrop /> : null}
         <fog attach="fog" args={[C.bg, 100, 600]} />
         <Lights />
         {showChromatin ? <Chromatin detail={detail} /> : null}
-        {f >= 300 && f < 600 ? <Nucleus /> : null}
+        {f >= 300 && f < 600 && t < GAP_T0 ? <Nucleus /> : null}
         <Tissue />
-        <Tracks />
-        <TechScene />
+        <GapStage />
         <Rig />
       </ThreeCanvas>
       <Overlay />

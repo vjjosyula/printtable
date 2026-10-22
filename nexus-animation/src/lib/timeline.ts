@@ -47,7 +47,9 @@ export function storySeconds(videoSeconds: number): number {
 }
 
 /** Story frame (0..960, fractional) for a video frame. */
-export const storyFrame = (videoFrame: number) => storySeconds(videoFrame / FPS) * 30;
+// the story clock stops when the film dives into the gap stage (see scene/view.ts GAP_T0)
+export const STORY_STOP_S = 41.2;
+export const storyFrame = (videoFrame: number) => storySeconds(Math.min(videoFrame / FPS, STORY_STOP_S)) * 30;
 export const useStoryFrame = () => storyFrame(useCurrentFrame());
 
 /** Inverse: video seconds at which a story frame happens (for audio cue placement). */

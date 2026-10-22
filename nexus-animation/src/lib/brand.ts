@@ -1,15 +1,24 @@
+/**
+ * Dark-scene palette (NEXUS brand, adjusted for contrast on a deep warm charcoal background).
+ */
 export const C = {
-  bg: '#FBF9F6',
-  panel: '#F4F1EC',
+  bg: '#22272B', // background and fog: deep warm charcoal
+  haze: '#2E3439', // slightly lighter haze in the distance, caption band
+  panel: '#2E3439',
+  offwhite: '#FBF9F6', // caption text, light logo
   sand: '#E9E4C6',
   charcoal: '#3F444A',
-  blue: '#295D9B',
-  teal: '#20887D',
-  coral: '#BE5038',
+  blue: '#295D9B', // HisTLAND kit tag
+  teal: '#20887D', // MeTLAND kit tag
+  markBlue: '#5B8FD0', // active mark H3K27ac and blue enzymes
+  coral: '#D9654B', // repressive mark H3K27me3, microglia
+  tealLight: '#2FA898', // RNA polymerase, RNA, methyl groups, astrocytes
+  magenta: '#E0409A', // neurons
+  keyword: '#8DB3E2', // highlighted caption word
   grey: '#626262',
-  // DNA uses lighter tints of the brand colours (70% colour + 30% off-white) so it reads
-  // bright and inviting, while the saturated blue/teal stay reserved for marks and enzymes.
-  strandA: '#688CB6', // denim-blue tint
-  strandB: '#62AAA1', // teal tint
-  rung: '#E9E4C6', // full sand
+  // DNA backbone in sand; base-pair rungs are off-white at 60% over the background
+  strandA: '#E9E4C6',
+  strandB: '#E9E4C6',
+  rung: '#A4A5A5',
+  core: '#D3CDAE', // histone cores: sand, a touch darker so wrapped DNA still reads
 };

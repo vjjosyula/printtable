@@ -16,7 +16,7 @@ export const NUCLEUS_R = 0.353 * TISSUE_K; // ~1200 units
  * strand tints with sand nucleosome beads. Fibres hugging the envelope are drawn compact and in a
  * coral tint (repressed heterochromatin sits at the nuclear periphery); a sand nucleolus sits off-centre.
  */
-const CORAL_TINT = '#D08371';
+const CORAL_TINT = C.coral;
 function buildFibres() {
   const rnd = mulberry32(42);
   const strings: Record<string, THREE.BufferGeometry[]> = {[C.strandA]: [], [C.strandB]: [], [CORAL_TINT]: []};
@@ -82,8 +82,8 @@ const poreGeo = new THREE.TorusGeometry(26, 9, 10, 24);
 const beadGeo = new THREE.SphereGeometry(7.5, 12, 8);
 beadGeo.scale(1, 1, 0.65);
 
-const stringMats = Object.fromEntries([C.strandA, C.strandB, CORAL_TINT].map((c) => [c, clay(c)])) as Record<string, THREE.MeshPhysicalMaterial>;
-const beadMat = clay(C.sand);
+const stringMats = Object.fromEntries([C.strandA, C.strandB, CORAL_TINT].map((c) => [c, clay(c === C.strandA ? '#B9B49A' : c)])) as Record<string, THREE.MeshPhysicalMaterial>;
+const beadMat = clay(C.core);
 const envMat = clay(C.panel, {side: THREE.DoubleSide});
 const poreMat = clay(C.sand);
 const nucleolusMat = clay(C.sand);
@@ -144,7 +144,7 @@ export const Nucleus: React.FC = () => {
   clipPlane.set(n.clone().negate(), n.dot(P0));
   // nucleus takes on the neuron colour once seen from outside the cell
   const out = smoothstep(Math.log(5000), Math.log(20000), Math.log(cam.dist));
-  envMat.color.set(C.panel).lerp(new THREE.Color(C.blue), out);
+  envMat.color.set(C.haze).lerp(new THREE.Color(C.magenta), out);
   const pulse = 1 + 0.035 * Math.sin((f - 400) * 0.16) * out;
   const visible = cam.dist < 60 ? false : true;
   return (

@@ -1,17 +1,15 @@
 import React, {useEffect, useMemo} from 'react';
-import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useFrame, useThree} from '@react-three/fiber';
 import {getInputProps, useCurrentFrame} from 'remotion';
 import {DepthOfFieldEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect} from 'postprocessing';
 import {N8AOPostPass} from 'n8ao';
-import {cameraAt, viewOffsetY} from './camera';
+import {offsetAt, viewAt} from './view';
 import {C} from '../lib/brand';
-import {darkAmount, DARK_EDGE} from './background';
 
 /** Positions the camera, fog and post-processing for the current frame and renders. */
 export const Rig: React.FC<{dofScale?: number}> = () => {
-  const f = useStoryFrame();
+  const f = useCurrentFrame();
   const {gl, scene, camera, size} = useThree();
   const cam = camera as THREE.PerspectiveCamera;
 
@@ -29,7 +27,7 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     ao.configuration.denoiseSamples = preview ? 4 : 8;
     ao.configuration.halfRes = preview;
     ao.configuration.denoiseRadius = 12;
-    ao.configuration.color = new THREE.Color(C.charcoal);
+    ao.configuration.color = new THREE.Color('#111416');
     ao.configuration.gammaCorrection = false;
     composer.addPass(ao);
     const dof = new DepthOfFieldEffect(cam, {worldFocusDistance: 50, worldFocusRange: 40, bokehScale: 2.2, resolutionScale: preview ? 0.5 : 0.75});
@@ -41,7 +39,7 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
   useEffect(() => () => fx.composer.dispose(), [fx]);
 
   useFrame(() => {
-    const s = cameraAt(f);
+    const s = viewAt(f);
     cam.position.copy(s.pos);
     cam.up.set(0, 1, 0);
     cam.lookAt(s.target);
@@ -49,7 +47,7 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     cam.near = s.dist * 0.02;
     cam.far = s.dist * 40;
     // keep subjects below the caption band (top third); centred again for the end card
-    const offY = viewOffsetY(f);
+    const offY = offsetAt(f);
     cam.setViewOffset(size.width, size.height, 0, -size.height * offY, size.width, size.height);
     cam.updateProjectionMatrix();
     cam.updateMatrixWorld();
@@ -57,11 +55,11 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     if (fog) {
       fog.near = s.dist * 1.15;
       fog.far = s.dist * 5.5;
-      fog.color.set(C.bg).lerp(DARK_EDGE, darkAmount(f));
+      fog.color.set(C.bg);
     }
     {
       // softer ambient occlusion on the dark backdrop so thin processes do not turn charcoal
-      fx.ao.configuration.intensity = 1.4 * (1 - 0.65 * darkAmount(f));
+      fx.ao.configuration.intensity = 1.0;
     }
     fx.dof.cocMaterial.worldFocusDistance = s.dist;
     fx.dof.cocMaterial.worldFocusRange = s.dist * 0.75;
