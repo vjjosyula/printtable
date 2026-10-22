@@ -74,12 +74,77 @@ function makeCell(type: CellType, seed: number, outlinePad = 0): {geo: THREE.Buf
     }
   };
   if (type === 'neuron') {
-    parts.push(somaGeo(1.0, 1.0, 0.85, 1.25));
+    // Pyramidal neuron: teardrop soma, one thick apical dendrite (along -z, so neighbours line up like a
+    // cortical layer) ending in a tuft, oblique branches, a skirt of basal dendrites with spines, and a long axon.
+    const apical = new THREE.Vector3(0, 0.05, -1).normalize();
+    parts.push(somaGeo(0.85, 1.0, 0.8, 1.0));
+    parts.push(tubeGeometry([0, 0, -0.3, 0, 0.02, -0.9, 0, 0.04, -1.45], (u) => 0.72 - 0.38 * u, 16));
     nucleusR = 0.353;
-    prim(5, [2.2, 3.4], 0.26, 2, {children: [2, 3], lenFactor: 0.6, spread: 1.1, wiggle: 0.35, flat: 0.4, rFactor: 0.55}, 1.0);
-    // axon
-    const a = rnd() * Math.PI * 2;
-    branch(rnd, parts, new THREE.Vector3(Math.cos(a), 0, Math.sin(a)).multiplyScalar(0.9), new THREE.Vector3(Math.cos(a), -0.05, Math.sin(a)), 8 + rnd() * 3, 0.1, 0, {children: [0, 0], lenFactor: 0, spread: 0, wiggle: 0.12, flat: 0.3, rFactor: 0.7}, outlinePad);
+    const apicalPts: THREE.Vector3[] = [];
+    {
+      const pts: number[] = [];
+      const p = new THREE.Vector3(0, 0.04, -1.4);
+      const d = apical.clone();
+      for (let k = 0; k < 26; k++) {
+        pts.push(p.x, p.y, p.z);
+        apicalPts.push(p.clone());
+        d.x += (rnd() - 0.5) * 0.08;
+        d.normalize();
+        p.addScaledVector(d, 5.2 / 25);
+      }
+      parts.push(tubeGeometry(pts, (u) => 0.34 - 0.2 * u + outlinePad, 12));
+    }
+    // apical tuft
+    const top = apicalPts[apicalPts.length - 1];
+    for (let i = 0; i < 4; i++) {
+      const a = -0.9 + (i / 3) * 1.8 + (rnd() - 0.5) * 0.3;
+      const d = new THREE.Vector3(Math.sin(a), 0.1 * (rnd() - 0.5), -Math.cos(a)).normalize();
+      branch(rnd, parts, top, d, 1.4 + rnd() * 0.8, 0.12, 1, {children: [1, 2], lenFactor: 0.6, spread: 0.9, wiggle: 0.3, flat: 0.2, rFactor: 0.6}, outlinePad);
+    }
+    // oblique branches off the apical shaft
+    for (const at of [8, 14, 19]) {
+      const side = rnd() < 0.5 ? -1 : 1;
+      const d = new THREE.Vector3(side, 0, -0.5 - rnd() * 0.3).normalize();
+      branch(rnd, parts, apicalPts[at], d, 1.0 + rnd() * 0.6, 0.09, 0, {children: [0, 0], lenFactor: 0, spread: 0, wiggle: 0.3, flat: 0.2, rFactor: 0.6}, outlinePad);
+    }
+    // basal dendrites fan out from the base of the soma
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI * (0.18 + (0.64 * i) / 5) + (rnd() - 0.5) * 0.2;
+      const d = new THREE.Vector3(Math.cos(a), (rnd() - 0.5) * 0.15, Math.sin(a)).normalize();
+      branch(rnd, parts, d.clone().multiplyScalar(0.7), d, 1.8 + rnd() * 1.0, 0.16, 2, {children: [1, 2], lenFactor: 0.6, spread: 1.0, wiggle: 0.35, flat: 0.2, rFactor: 0.5}, outlinePad);
+    }
+    // axon from the base, with two collaterals
+    {
+      const pts: number[] = [];
+      const p = new THREE.Vector3(0, -0.05, 0.75);
+      const d = new THREE.Vector3((rnd() - 0.5) * 0.3, -0.03, 1).normalize();
+      const branchPts: THREE.Vector3[] = [];
+      for (let k = 0; k < 40; k++) {
+        pts.push(p.x, p.y, p.z);
+        branchPts.push(p.clone());
+        d.x += (rnd() - 0.5) * 0.12;
+        d.normalize();
+        p.addScaledVector(d, 0.24);
+      }
+      parts.push(tubeGeometry(pts, (u) => (u < 0.06 ? 0.16 - u : 0.075) + outlinePad, 10));
+      for (const at of [14, 27]) {
+        const side = rnd() < 0.5 ? -1 : 1;
+        branch(rnd, parts, branchPts[at], new THREE.Vector3(side, 0, 0.6).normalize(), 2.0 + rnd(), 0.05, 0, {children: [0, 0], lenFactor: 0, spread: 0, wiggle: 0.25, flat: 0.2, rFactor: 0.8}, outlinePad);
+      }
+    }
+    // dendritic spines along the apical shaft
+    if (!outlinePad) {
+      for (let k = 3; k < apicalPts.length; k++) {
+        for (let j = 0; j < 2; j++) {
+          const a = rnd() * Math.PI * 2;
+          const off = new THREE.Vector3(Math.cos(a), Math.sin(a) * 0.6, 0).multiplyScalar(0.26 - 0.15 * (k / apicalPts.length) + 0.08);
+          const g = new THREE.SphereGeometry(0.065, 6, 4);
+          const c = apicalPts[k].clone().add(off);
+          g.translate(c.x, c.y, c.z);
+          parts.push(g);
+        }
+      }
+    }
   } else if (type === 'astro') {
     parts.push(somaGeo(0.6));
     nucleusR = 0.3;
@@ -120,7 +185,7 @@ function buildTissue(): Cell[] {
   ];
   const placed: THREE.Vector3[] = [new THREE.Vector3(0, 0, 0)];
   const neuron0 = makeCell('neuron', 1);
-  cells.push({type: 'neuron', pos: new THREE.Vector3(0, 0, 0), rot: 0.4, ...neuron0, phase: 0});
+  cells.push({type: 'neuron', pos: new THREE.Vector3(0, 0, 0), rot: 0, ...neuron0, phase: 0});
   let seed = 10;
   for (const [type, count] of counts) {
     const n = type === 'neuron' ? count - 1 : count;
@@ -137,7 +202,8 @@ function buildTissue(): Cell[] {
       placed.push(p);
       const c = makeCell(type, seed++);
       const outline = type === 'oligo' ? makeCell(type, seed - 1, 0.05).geo : undefined;
-      cells.push({type, pos: p, rot: rnd() * Math.PI * 2, ...c, outline, phase: rnd() * Math.PI * 2});
+      const rr = rnd();
+      cells.push({type, pos: p, rot: type === 'neuron' ? (rr - 0.5) * 0.5 : rr * Math.PI * 2, ...c, outline, phase: rnd() * Math.PI * 2});
     }
   }
   return cells;
@@ -153,17 +219,17 @@ export function repCell(type: CellType) {
   const same = cells.filter((c) => c.type === type && c.pos.length() > 0.1);
   // choose the one closest to a fixed spot on the front side for each type
   const spots: Record<CellType, THREE.Vector3> = {
-    neuron: new THREE.Vector3(-5, 0, 2),
-    astro: new THREE.Vector3(-1.5, 0, 4),
-    oligo: new THREE.Vector3(2, 0, 3),
-    micro: new THREE.Vector3(5, 0, 2),
+    neuron: new THREE.Vector3(-3.5, 0, 0.5),
+    astro: new THREE.Vector3(2.5, 0, 1.5),
+    oligo: new THREE.Vector3(-1, 0, -2.5),
+    micro: new THREE.Vector3(3.5, 0, -2),
   };
   void pick;
   return same.reduce((best, c) => (c.pos.distanceTo(spots[type]) < best.pos.distanceTo(spots[type]) ? c : best), same[0]);
 }
 
 const bodyMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
-  neuron: clay(C.blue, {transparent: true, opacity: 0.55}),
+  neuron: clay(C.blue, {transparent: true, opacity: 0.82}),
   astro: clay(C.teal, {transparent: true, opacity: 0.55}),
   oligo: clay(C.sand, {transparent: true, opacity: 0.85}),
   micro: clay(C.coral, {transparent: true, opacity: 0.6}),
@@ -196,7 +262,7 @@ export const Tissue: React.FC = () => {
     const base = new THREE.Color(TYPE_COLOR[t]);
     bodyMats[t].color.copy(base).lerp(grey, blend);
     nucMats[t].color.copy(base).lerp(grey, blend);
-    bodyMats[t].opacity = (t === 'oligo' ? 0.85 : 0.55) * fade;
+    bodyMats[t].opacity = (t === 'oligo' ? 0.85 : t === 'neuron' ? 0.82 : 0.55) * fade;
     nucMats[t].transparent = fade < 1;
     nucMats[t].opacity = fade;
   }

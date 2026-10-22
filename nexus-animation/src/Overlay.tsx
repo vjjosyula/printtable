@@ -9,7 +9,7 @@ import {cameraAt, NUCLEUS_CENTER, TISSUE_K, viewOffsetY} from './scene/camera';
 import {worldAt} from './scene/state';
 import {tailPoints} from './scene/tails';
 import {mergeAmount, SLOT_Y, WIDTH, MERGED_Y} from './scene/Tracks';
-import {TYPES} from './scene/Tissue';
+import {repCell, TYPES} from './scene/Tissue';
 import {techAnchors} from './scene/tech';
 import {ramp} from './lib/math';
 
@@ -175,6 +175,37 @@ const MarkTags: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
   return <>{out}</>;
 };
 
+const CELL_NAME: Record<string, string> = {neuron: 'Neuron', astro: 'Astrocyte', oligo: 'Oligodendrocyte', micro: 'Microglia'};
+const CELL_BG: Record<string, string> = {neuron: C.blue, astro: C.teal, oligo: C.sand, micro: C.coral};
+/** Name one example of each cell type while the narration lists them. */
+const CellLabels: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
+  const proj = makeProjector(sf, w, h);
+  const square = h < 1200;
+  return (
+    <>
+      {TYPES.map((t, i) => {
+        const o = ramp(sf, 500 + i * 8, 516 + i * 8, (x) => x) * (1 - ramp(sf, 596, 612, (x) => x));
+        if (o <= 0) return null;
+        const c = repCell(t);
+        const p = proj(c.pos.clone().multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
+        if (p.behind) return null;
+        const fs = square ? 26 : 30;
+        const half = (CELL_NAME[t].length * 0.56 * fs + 32) / 2;
+        const x = clampToFrame(p.x, 80 + half, w - 80 - half);
+        const y = clampToFrame(p.y, square ? 380 : 440, h - 140);
+        return (
+          <div key={t} style={{position: 'absolute', left: x, top: y, transform: `translate(-50%, -100%) translateY(${-26 - (1 - o) * 10}px)`, opacity: o, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4}}>
+            <div style={{background: CELL_BG[t], color: t === 'oligo' ? C.charcoal : '#FBF9F6', border: t === 'oligo' ? `2px solid ${C.charcoal}` : 'none', borderRadius: 14, padding: '6px 14px 8px', fontFamily, fontWeight: 800, fontSize: square ? 26 : 30, whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(63,68,74,0.16)'}}>
+              {CELL_NAME[t]}
+            </div>
+            <div style={{width: 3, height: 18, background: t === 'oligo' ? C.charcoal : CELL_BG[t], borderRadius: 2}} />
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
 const KitTags: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
   const proj = makeProjector(sf, w, h);
   const a = techAnchors(sf);
@@ -268,6 +299,7 @@ export const Overlay: React.FC = () => {
         </div>
       ) : null}
       {sf < 420 ? <MarkTags sf={sf} w={width} h={height} /> : null}
+      {sf > 495 && sf < 615 ? <CellLabels sf={sf} w={width} h={height} /> : null}
       {sf > 600 && sf < 870 ? <TrackLabels sf={sf} w={width} h={height} /> : null}
       {sf > 990 && sf < 1450 ? <KitTags sf={sf} w={width} h={height} /> : null}
       {CAPTIONS.map((c, i) => (
