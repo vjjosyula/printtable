@@ -16,9 +16,9 @@ export const C = {
   magenta: '#E0409A', // neurons
   keyword: '#8DB3E2', // highlighted caption word
   grey: '#626262',
-  // DNA backbone in sand; base-pair rungs are off-white at 60% over the background
-  strandA: '#E9E4C6',
-  strandB: '#E9E4C6',
-  rung: '#A4A5A5',
+  // DNA backbone in cyan (clearly apart from the sand histone cores); rungs a pale cyan-grey
+  strandA: '#3FC8DE',
+  strandB: '#2AAFC8',
+  rung: '#A9C7CD',
   core: '#D3CDAE', // histone cores: sand, a touch darker so wrapped DNA still reads
 };

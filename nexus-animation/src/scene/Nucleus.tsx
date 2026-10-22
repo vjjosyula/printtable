@@ -82,7 +82,7 @@ const poreGeo = new THREE.TorusGeometry(26, 9, 10, 24);
 const beadGeo = new THREE.SphereGeometry(7.5, 12, 8);
 beadGeo.scale(1, 1, 0.65);
 
-const stringMats = Object.fromEntries([C.strandA, C.strandB, CORAL_TINT].map((c) => [c, clay(c === C.strandA ? '#B9B49A' : c)])) as Record<string, THREE.MeshPhysicalMaterial>;
+const stringMats = Object.fromEntries([C.strandA, C.strandB, CORAL_TINT].map((c) => [c, clay(c)])) as Record<string, THREE.MeshPhysicalMaterial>;
 const beadMat = clay(C.core);
 const envMat = clay(C.panel, {side: THREE.DoubleSide});
 const poreMat = clay(C.sand);
