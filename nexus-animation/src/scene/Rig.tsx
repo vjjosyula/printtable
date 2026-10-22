@@ -7,6 +7,7 @@ import {DepthOfFieldEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect} 
 import {N8AOPostPass} from 'n8ao';
 import {cameraAt, viewOffsetY} from './camera';
 import {C} from '../lib/brand';
+import {darkAmount, DARK_EDGE} from './background';
 
 /** Positions the camera, fog and post-processing for the current frame and renders. */
 export const Rig: React.FC<{dofScale?: number}> = () => {
@@ -56,6 +57,11 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     if (fog) {
       fog.near = s.dist * 1.15;
       fog.far = s.dist * 5.5;
+      fog.color.set(C.bg).lerp(DARK_EDGE, darkAmount(f));
+    }
+    {
+      // softer ambient occlusion on the dark backdrop so thin processes do not turn charcoal
+      fx.ao.configuration.intensity = 1.4 * (1 - 0.65 * darkAmount(f));
     }
     fx.dof.cocMaterial.worldFocusDistance = s.dist;
     fx.dof.cocMaterial.worldFocusRange = s.dist * 0.75;

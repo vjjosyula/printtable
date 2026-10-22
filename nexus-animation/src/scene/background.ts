@@ -39,3 +39,17 @@ export function brandBackground(w: number, h: number) {
   cache.set(key, tex);
   return tex;
 }
+
+/**
+ * Deep NEXUS-blue backdrop used while the camera is among the cells. It crossfades in after we leave the
+ * neuron and back out as the signal tracks rise, so tracks and text always sit on the light background.
+ */
+export const darkAmount = (f: number) => {
+  const sm = (a: number, b: number, x: number) => {
+    const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  };
+  return sm(468, 520, f) * (1 - sm(586, 632, f));
+};
+export const DARK_CENTER = new THREE.Color(C.blue).lerp(new THREE.Color(C.bg), 0.08);
+export const DARK_EDGE = new THREE.Color(C.blue).lerp(new THREE.Color(C.charcoal), 0.55);

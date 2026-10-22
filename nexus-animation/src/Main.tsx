@@ -11,7 +11,8 @@ import {Nucleus} from './scene/Nucleus';
 import {Tissue} from './scene/Tissue';
 import {Tracks} from './scene/Tracks';
 import {TechScene} from './scene/TechScene';
-import {brandBackground} from './scene/background';
+import {Backdrop} from './scene/Backdrop';
+import {brandBackground, darkAmount} from './scene/background';
 import {Overlay} from './Overlay';
 import {useCurrentFrame} from 'remotion';
 import {cameraAt} from './scene/camera';
@@ -34,6 +35,7 @@ export const Main: React.FC = () => {
         }}
       >
         <primitive attach="background" object={brandBackground(width, height)} />
+        {darkAmount(f) > 0 ? <Backdrop /> : null}
         <fog attach="fog" args={[C.bg, 100, 600]} />
         <Lights />
         {showChromatin ? <Chromatin detail={detail} /> : null}
