@@ -266,7 +266,7 @@ export const Overlay: React.FC = () => {
   const sf = storyFrame(f);
   const {width, height} = useVideoConfig();
   const square = height < 1200;
-  const endStart = 85.2;
+  const endStart = 85.1;
   return (
     <AbsoluteFill style={{pointerEvents: 'none'}}>
       {LOGO_FILE && t > 1.5 && t < 85.0 ? (
@@ -292,20 +292,12 @@ export const Overlay: React.FC = () => {
         <Caption key={i} c={c} t={t} size={square ? 54 : 60} />
       ))}
       {t >= endStart ? (
-        <div style={{position: 'absolute', left: 80, right: 80, bottom: 80, fontFamily, color: C.offwhite}}>
-          <EndLine t={t} at={85.3} style={{marginBottom: square ? 4 : 8}}>
-            <Img src={staticFile(LOGO_LIGHT)} style={{height: square ? 104 : 128, width: 'auto', display: 'block'}} />
+        // end card: the scene fades to the background and only the logo remains
+        <AbsoluteFill style={{background: C.bg, opacity: interpolate(t, [endStart, endStart + 0.8], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)}), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <EndLine t={t} at={endStart + 0.5} style={{}}>
+            <Img src={staticFile(LOGO_LIGHT)} style={{width: square ? 620 : 680, height: 'auto', display: 'block'}} />
           </EndLine>
-          <EndLine t={t} at={85.9} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: square ? 12 : 20, lineHeight: 1.25}}>
-            Founded in Stockholm, 2024.
-          </EndLine>
-          <EndLine t={t} at={86.6} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: 8, lineHeight: 1.25, maxWidth: 900}}>
-            Kits built on methods published in <span style={{fontWeight: 800, color: C.keyword}}>Nature Biotechnology</span>.
-          </EndLine>
-          <EndLine t={t} at={87.4} style={{fontWeight: 800, fontSize: square ? 48 : 58, marginTop: square ? 18 : 30, letterSpacing: -0.5, lineHeight: 1.12, maxWidth: 920}}>
-            What is the question you are solving in epigenetics?
-          </EndLine>
-        </div>
+        </AbsoluteFill>
       ) : null}
     </AbsoluteFill>
   );
