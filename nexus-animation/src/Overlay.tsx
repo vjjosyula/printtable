@@ -181,27 +181,37 @@ const CELL_BG: Record<string, string> = {neuron: C.blue, astro: C.teal, oligo: C
 const CellLabels: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
   const proj = makeProjector(sf, w, h);
   const square = h < 1200;
+  // place labels, then push apart any that would overlap
+  const fs = square ? 26 : 30;
+  const items = TYPES.map((t, i) => {
+    const o = ramp(sf, 500 + i * 8, 516 + i * 8, (x) => x) * (1 - ramp(sf, 596, 612, (x) => x));
+    const c = repCell(t);
+    const p = proj(c.pos.clone().multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
+    const half = (CELL_NAME[t].length * 0.56 * fs + 32) / 2;
+    return {t, o, p, half, x: clampToFrame(p.x, 80 + half, w - 80 - half), y: clampToFrame(p.y, square ? 380 : 440, h - 140)};
+  }).filter((it) => it.o > 0 && !it.p.behind && it.p.x > 40 && it.p.x < w - 40 && it.p.y > 120 && it.p.y < h - 60);
+  items.sort((a, b) => a.y - b.y);
+  for (let pass = 0; pass < 3; pass++)
+    for (let a = 0; a < items.length; a++)
+      for (let b = a + 1; b < items.length; b++) {
+        const A = items[a], B = items[b];
+        const overlapX = Math.abs(A.x - B.x) < A.half + B.half + 12;
+        if (overlapX && Math.abs(A.y - B.y) < fs * 2 + 16) B.y = A.y + fs * 2 + 16;
+      }
   return (
     <>
-      {TYPES.map((t, i) => {
-        const o = ramp(sf, 500 + i * 8, 516 + i * 8, (x) => x) * (1 - ramp(sf, 596, 612, (x) => x));
-        if (o <= 0) return null;
-        const c = repCell(t);
-        const p = proj(c.pos.clone().multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
-        if (p.behind) return null;
-        const fs = square ? 26 : 30;
-        const half = (CELL_NAME[t].length * 0.56 * fs + 32) / 2;
-        const x = clampToFrame(p.x, 80 + half, w - 80 - half);
-        const y = clampToFrame(p.y, square ? 380 : 440, h - 140);
-        return (
-          <div key={t} style={{position: 'absolute', left: x, top: y, transform: `translate(-50%, -100%) translateY(${-26 - (1 - o) * 10}px)`, opacity: o, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4}}>
-            <div style={{background: CELL_BG[t], color: t === 'oligo' ? C.charcoal : '#FBF9F6', border: t === 'oligo' ? `2px solid ${C.charcoal}` : 'none', borderRadius: 14, padding: '6px 14px 8px', fontFamily, fontWeight: 800, fontSize: square ? 26 : 30, whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(63,68,74,0.16)'}}>
+      {items.map(({t, o, x, y, p}) => (
+        <React.Fragment key={t}>
+          <svg style={{position: 'absolute', left: 0, top: 0, overflow: 'visible', opacity: o}} width={1} height={1}>
+            <line x1={x} y1={y - 26} x2={clampToFrame(p.x, 0, w)} y2={clampToFrame(p.y, 0, h)} stroke={t === 'oligo' ? C.charcoal : CELL_BG[t]} strokeWidth={3} strokeLinecap="round" />
+          </svg>
+          <div style={{position: 'absolute', left: x, top: y, transform: `translate(-50%, -100%) translateY(${-26 - (1 - o) * 10}px)`, opacity: o}}>
+            <div style={{background: CELL_BG[t], color: t === 'oligo' ? C.charcoal : '#FBF9F6', border: t === 'oligo' ? `2px solid ${C.charcoal}` : 'none', borderRadius: 14, padding: '6px 14px 8px', fontFamily, fontWeight: 800, fontSize: fs, whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(63,68,74,0.16)'}}>
               {CELL_NAME[t]}
             </div>
-            <div style={{width: 3, height: 18, background: t === 'oligo' ? C.charcoal : CELL_BG[t], borderRadius: 2}} />
           </div>
-        );
-      })}
+        </React.Fragment>
+      ))}
     </>
   );
 };

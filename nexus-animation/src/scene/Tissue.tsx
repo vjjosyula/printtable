@@ -36,7 +36,7 @@ function branch(
     d.x += (rnd() - 0.5) * spec.wiggle;
     d.y += (rnd() - 0.5) * spec.wiggle * spec.flat;
     d.z += (rnd() - 0.5) * spec.wiggle;
-    d.y *= 0.85;
+    d.y *= 0.95;
     d.normalize();
     p.addScaledVector(d, len / (n - 1));
   }
@@ -99,7 +99,7 @@ function makeCell(type: CellType, seed: number, outlinePad = 0): {geo: THREE.Buf
     for (let i = 0; i < 4; i++) {
       const a = -0.9 + (i / 3) * 1.8 + (rnd() - 0.5) * 0.3;
       const d = new THREE.Vector3(Math.sin(a), 0.1 * (rnd() - 0.5), -Math.cos(a)).normalize();
-      branch(rnd, parts, top, d, 1.4 + rnd() * 0.8, 0.12, 1, {children: [1, 2], lenFactor: 0.6, spread: 0.9, wiggle: 0.3, flat: 0.2, rFactor: 0.6}, outlinePad);
+      branch(rnd, parts, top, d, 1.4 + rnd() * 0.8, 0.12, 1, {children: [1, 2], lenFactor: 0.6, spread: 0.9, wiggle: 0.3, flat: 0.5, rFactor: 0.6}, outlinePad);
     }
     // oblique branches off the apical shaft
     for (const at of [8, 14, 19]) {
@@ -110,8 +110,8 @@ function makeCell(type: CellType, seed: number, outlinePad = 0): {geo: THREE.Buf
     // basal dendrites fan out from the base of the soma
     for (let i = 0; i < 6; i++) {
       const a = Math.PI * (0.18 + (0.64 * i) / 5) + (rnd() - 0.5) * 0.2;
-      const d = new THREE.Vector3(Math.cos(a), (rnd() - 0.5) * 0.15, Math.sin(a)).normalize();
-      branch(rnd, parts, d.clone().multiplyScalar(0.7), d, 1.8 + rnd() * 1.0, 0.16, 2, {children: [1, 2], lenFactor: 0.6, spread: 1.0, wiggle: 0.35, flat: 0.2, rFactor: 0.5}, outlinePad);
+      const d = new THREE.Vector3(Math.cos(a), (rnd() - 0.5) * 0.6, Math.sin(a)).normalize();
+      branch(rnd, parts, d.clone().multiplyScalar(0.7), d, 1.8 + rnd() * 1.0, 0.16, 2, {children: [1, 2], lenFactor: 0.6, spread: 1.0, wiggle: 0.35, flat: 0.6, rFactor: 0.5}, outlinePad);
     }
     // axon from the base, with two collaterals
     {
@@ -196,7 +196,7 @@ function buildTissue(): Cell[] {
       do {
         const a = rnd() * Math.PI * 2;
         const r = 2.5 + Math.sqrt(rnd()) * 11.5;
-        p = new THREE.Vector3(Math.cos(a) * r, (rnd() - 0.5) * 1.6, Math.sin(a) * r * 0.85);
+        p = new THREE.Vector3(Math.cos(a) * r, (rnd() - 0.5) * 3.0, Math.sin(a) * r * 0.85);
         tries++;
       } while (tries < 200 && placed.some((q) => q.distanceTo(p) < minD));
       placed.push(p);
@@ -228,12 +228,17 @@ export function repCell(type: CellType) {
   return same.reduce((best, c) => (c.pos.distanceTo(spots[type]) < best.pos.distanceTo(spots[type]) ? c : best), same[0]);
 }
 
+// Solid (opaque) cells so they shade and cast ambient occlusion like real 3D objects.
+// Bodies are a lighter tint of the type colour; the nucleus bulges out in the full colour.
 const bodyMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
-  neuron: clay(C.blue, {transparent: true, opacity: 0.82}),
-  astro: clay(C.teal, {transparent: true, opacity: 0.55}),
-  oligo: clay(C.sand, {transparent: true, opacity: 0.85}),
-  micro: clay(C.coral, {transparent: true, opacity: 0.6}),
+  neuron: clay(C.blue),
+  astro: clay(C.teal),
+  oligo: clay(C.sand),
+  micro: clay(C.coral),
 };
+const BODY_TINT: Record<CellType, number> = {neuron: 0.12, astro: 0.2, oligo: 0, micro: 0.18};
+const NUC_LIFT: Record<CellType, number> = {neuron: 0.5, astro: 0.42, oligo: 0.36, micro: 0.2};
+const offWhite = new THREE.Color(C.bg);
 const nucMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
   neuron: clay(C.blue),
   astro: clay(C.teal),
@@ -260,9 +265,10 @@ export const Tissue: React.FC = () => {
   const leave = smoothstep(Math.log(4500), Math.log(16000), Math.log(cam.dist));
   for (const t of TYPES) {
     const base = new THREE.Color(TYPE_COLOR[t]);
-    bodyMats[t].color.copy(base).lerp(grey, blend);
+    bodyMats[t].color.copy(base).lerp(offWhite, BODY_TINT[t]).lerp(grey, blend);
     nucMats[t].color.copy(base).lerp(grey, blend);
-    bodyMats[t].opacity = (t === 'oligo' ? 0.85 : t === 'neuron' ? 0.82 : 0.55) * fade;
+    bodyMats[t].transparent = fade < 1;
+    bodyMats[t].opacity = fade;
     nucMats[t].transparent = fade < 1;
     nucMats[t].opacity = fade;
   }
@@ -288,11 +294,11 @@ export const Tissue: React.FC = () => {
               <mesh geometry={c.geo} material={isHero ? heroMat(bodyMats[c.type], leave) : bodyMats[c.type]} renderOrder={2} />
             ) : null}
             {c.outline ? <mesh geometry={c.outline} material={outlineMat} renderOrder={1} /> : null}
-            {isHero ? null : (
+            {isHero && leave < 0.97 ? null : (
               <>
-                <mesh geometry={sphere} material={nucMats[c.type]} position={c.nucleusOff} scale={[c.nucleusR * pulse, c.nucleusR * pulse * 0.9, c.nucleusR * pulse * 1.1]} />
+                <mesh geometry={sphere} material={nucMats[c.type]} position={[c.nucleusOff.x, c.nucleusOff.y + NUC_LIFT[c.type], c.nucleusOff.z]} scale={[c.nucleusR * pulse, c.nucleusR * pulse * 0.9, c.nucleusR * pulse * 1.1]} />
                 {c.type === 'oligo' ? (
-                  <mesh geometry={sphere} material={nucOutlineMat} position={c.nucleusOff} scale={[(c.nucleusR + 0.04) * pulse, (c.nucleusR + 0.04) * pulse * 0.9, (c.nucleusR + 0.04) * pulse * 1.1]} />
+                  <mesh geometry={sphere} material={nucOutlineMat} position={[c.nucleusOff.x, c.nucleusOff.y + NUC_LIFT[c.type], c.nucleusOff.z]} scale={[(c.nucleusR + 0.04) * pulse, (c.nucleusR + 0.04) * pulse * 0.9, (c.nucleusR + 0.04) * pulse * 1.1]} />
                 ) : null}
               </>
             )}
@@ -308,6 +314,7 @@ function heroMat(m: THREE.MeshPhysicalMaterial, k: number) {
   if (!heroCache.has(m)) heroCache.set(m, m.clone());
   const h = heroCache.get(m)!;
   h.color.copy(m.color);
+  h.transparent = k < 0.999 || m.transparent;
   h.opacity = m.opacity * clamp(k);
   h.depthWrite = k > 0.9;
   return h;
