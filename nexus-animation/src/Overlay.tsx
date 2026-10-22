@@ -332,11 +332,8 @@ export const Overlay: React.FC = () => {
           <EndLine t={t} at={85.0} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: 8, lineHeight: 1.25, maxWidth: 860}}>
             Closing the gap with <span style={{fontWeight: 800, color: C.teal}}>MeTLAND</span> and <span style={{fontWeight: 800, color: C.blue}}>Histland</span>.
           </EndLine>
-          <EndLine t={t} at={86.3} style={{fontWeight: 800, fontSize: square ? 54 : 66, marginTop: square ? 18 : 30, letterSpacing: -0.5, lineHeight: 1.1}}>
-            What is your biggest gap?
-          </EndLine>
-          <EndLine t={t} at={86.8} style={{fontWeight: 700, fontSize: square ? 32 : 38, marginTop: 10, color: C.blue}}>
-            Tell us in the comments.
+          <EndLine t={t} at={86.3} style={{fontWeight: 800, fontSize: square ? 48 : 58, marginTop: square ? 18 : 30, letterSpacing: -0.5, lineHeight: 1.12, maxWidth: 920}}>
+            What is the question you are solving in epigenetics?
           </EndLine>
         </div>
       ) : null}

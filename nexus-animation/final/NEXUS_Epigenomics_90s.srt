@@ -83,6 +83,6 @@ Two layers of the epigenome,
 ready to use in your own lab.
 
 18
-00:01:24,800 --> 00:01:27,327
-What is your biggest gap?
-Tell us in the comments.
+00:01:24,800 --> 00:01:27,906
+What is the question you are
+solving in epigenetics?
