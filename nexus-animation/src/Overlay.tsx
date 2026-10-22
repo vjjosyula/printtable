@@ -29,8 +29,8 @@ export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string;
   {from: 50.0, to: 56.7, lines: ['Cell-type signals get diluted.', 'Rare cells nearly vanish.'], key: 'diluted.'},
   {from: 57.6, to: 62.6, lines: ['NEXUS was founded', 'to close these gaps.'], key: 'gaps.'},
   {from: 63.0, to: 67.6, lines: ['Two ready-to-use kits.', 'MeTLAND and Histland.'], key: 'Two'},
-  {from: 68.0, to: 73.6, lines: ['MeTLAND maps', 'DNA methylation.'], key: 'MeTLAND', keyColor: C.teal},
-  {from: 73.8, to: 79.6, lines: ['Histland maps', 'histone marks.'], key: 'Histland'},
+  {from: 68.0, to: 73.6, lines: ['MeTLAND: DNA methylation,', 'in bulk or sorted cells.'], key: 'MeTLAND:', keyColor: C.teal},
+  {from: 73.8, to: 79.6, lines: ['Histland: histone marks,', 'in bulk or single cells.'], key: 'Histland:'},
   {from: 79.9, to: 83.0, lines: ['Two layers.', 'One epigenome.'], key: 'Two'},
 ];
 
@@ -184,8 +184,8 @@ const KitTags: React.FC<{sf: number; w: number; h: number}> = ({sf, w, h}) => {
   const ph = proj(a.mark);
   return (
     <>
-      {!pm.behind ? <Tag x={pm.x} y={pm.y} color={C.teal} title="MeTLAND" sub="DNA methylation" o={oM} side={pm.x > w * 0.55 ? -1 : 1} dy={150} /> : null}
-      {!ph.behind ? <Tag x={ph.x} y={ph.y} color={C.blue} title="Histland" sub="histone modifications" o={oH} side={ph.x > w * 0.5 ? -1 : 1} dy={-150} /> : null}
+      {!pm.behind ? <Tag x={pm.x} y={pm.y} color={C.teal} title="MeTLAND" sub="DNA methylation · bulk" o={oM} side={pm.x > w * 0.55 ? -1 : 1} dy={150} /> : null}
+      {!ph.behind ? <Tag x={ph.x} y={ph.y} color={C.blue} title="Histland" sub="histone marks · bulk + single cell" o={oH} side={ph.x > w * 0.5 ? -1 : 1} dy={-150} /> : null}
     </>
   );
 };

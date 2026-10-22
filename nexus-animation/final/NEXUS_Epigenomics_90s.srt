@@ -68,14 +68,14 @@ with two ready-to-use kits:
 MeTLAND and Histland.
 
 15
-00:01:08,400 --> 00:01:13,162
-MeTLAND maps DNA methylation, the
-chemical tags on the DNA itself.
+00:01:08,400 --> 00:01:13,850
+MeTLAND maps DNA methylation in bulk samples,
+including cell types you sort first.
 
 16
-00:01:13,900 --> 00:01:18,533
-Histland maps histone modifications, the
-marks that open and lock genes.
+00:01:13,900 --> 00:01:18,107
+Histland maps histone modifications,
+in bulk or in single cells.
 
 17
 00:01:19,300 --> 00:01:22,706

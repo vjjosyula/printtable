@@ -71,13 +71,13 @@
  },
  {
   "start": 68.4,
-  "say": "Metland maps DNA methylation, the chemical tags on the DNA itself.",
-  "show": "MeTLAND maps DNA methylation, the chemical tags on the DNA itself."
+  "say": "Metland maps DNA methylation in bulk samples, including cell types you sort first.",
+  "show": "MeTLAND maps DNA methylation in bulk samples, including cell types you sort first."
  },
  {
   "start": 73.9,
-  "say": "Histland maps histone modifications, the marks that open and lock genes.",
-  "show": "Histland maps histone modifications, the marks that open and lock genes."
+  "say": "Histland maps histone modifications, in bulk or in single cells.",
+  "show": "Histland maps histone modifications, in bulk or in single cells."
  },
  {
   "start": 79.3,
