@@ -2,7 +2,7 @@ import React, {useEffect, useMemo} from 'react';
 import {useStoryFrame} from '../lib/timeline';
 import * as THREE from 'three';
 import {useFrame, useThree} from '@react-three/fiber';
-import {useCurrentFrame} from 'remotion';
+import {getInputProps, useCurrentFrame} from 'remotion';
 import {DepthOfFieldEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect} from 'postprocessing';
 import {N8AOPostPass} from 'n8ao';
 import {cameraAt, viewOffsetY} from './camera';
@@ -14,26 +14,29 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
   const {gl, scene, camera, size} = useThree();
   const cam = camera as THREE.PerspectiveCamera;
 
+  const preview = Boolean((getInputProps() as {preview?: boolean}).preview);
   const fx = useMemo(() => {
-    const composer = new EffectComposer(gl, {frameBufferType: THREE.HalfFloatType, multisampling: 4});
+    const composer = new EffectComposer(gl, {frameBufferType: THREE.HalfFloatType, multisampling: preview ? 0 : 4});
     composer.addPass(new RenderPass(scene, cam));
     const ao = new N8AOPostPass(scene, cam, size.width, size.height);
     ao.configuration.aoRadius = 30;
     ao.configuration.screenSpaceRadius = true;
     ao.configuration.distanceFalloff = 0.35;
     ao.configuration.intensity = 1.4;
-    ao.configuration.aoSamples = 16;
-    ao.configuration.denoiseSamples = 8;
+    // previews trade a little AO/DOF quality for speed; final renders use full settings
+    ao.configuration.aoSamples = preview ? 8 : 16;
+    ao.configuration.denoiseSamples = preview ? 4 : 8;
+    ao.configuration.halfRes = preview;
     ao.configuration.denoiseRadius = 12;
     ao.configuration.color = new THREE.Color(C.charcoal);
     ao.configuration.gammaCorrection = false;
     composer.addPass(ao);
-    const dof = new DepthOfFieldEffect(cam, {worldFocusDistance: 50, worldFocusRange: 40, bokehScale: 2.2, resolutionScale: 0.75});
+    const dof = new DepthOfFieldEffect(cam, {worldFocusDistance: 50, worldFocusRange: 40, bokehScale: 2.2, resolutionScale: preview ? 0.5 : 0.75});
     composer.addPass(new EffectPass(cam, dof));
     composer.addPass(new EffectPass(cam, new SMAAEffect()));
     composer.setSize(size.width, size.height);
     return {composer, ao, dof};
-  }, [gl, scene, cam, size.width, size.height]);
+  }, [gl, scene, cam, size.width, size.height, preview]);
   useEffect(() => () => fx.composer.dispose(), [fx]);
 
   useFrame(() => {
