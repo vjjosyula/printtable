@@ -26,3 +26,6 @@ Do not apply yet. Apply when the user asks.
    "NEXUS was founded to close these gaps" or anything that presents NEXUS as the fix for dilution:
    that implies single-cell resolution, and MeTLAND® is bulk. Bridge neutrally instead, for example
    "NEXUS Epigenomics, founded in Stockholm, turns published methods into ready-to-use kits."
+10. Look: light throughout (keep the light warm background also in the brain-tissue section, no deep blue backdrop),
+    with the better textbook neurons (star-shaped soma, tapering forking dendrites, myelinated axon with bulb terminals),
+    coloured to read well on the light background.
