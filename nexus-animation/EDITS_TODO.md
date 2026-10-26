@@ -29,7 +29,6 @@ Do not apply yet. Apply when the user asks.
 10. Look: light throughout (keep the light warm background also in the brain-tissue section, no deep blue backdrop),
     with the better textbook neurons (star-shaped soma, tapering forking dendrites, myelinated axon with bulb terminals),
     coloured to read well on the light background.
-11. RNA polymerase (the big teal/cyan block that clamps on the DNA when H3K27ac opens it, about 17 to 31 s,
-    plus its RNA strand) changes from teal to a terracotta, similar to the coral of the H3K27me3 / methylation marks.
-    Use a distinct, softer terracotta (proposed #D08A63) so it does not read as a repressive mark (#BE5038),
-    unless the user asks for the exact same colour.
+11. The H3K27ac tag (the rounded label box around the text "H3K27ac / active mark · DNA opens", about 17 to 25 s)
+    changes colour to the same terracotta as the H3K27me3 tag box (#BE5038, white text).
+    Only that label box changes: the blue mark sphere, the writer enzyme, the polymerase and the DNA keep their colours.
