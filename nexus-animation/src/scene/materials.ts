@@ -17,7 +17,7 @@ export const M = {
   backboneB: clay(C.strandB, {roughness: 0.5}),
   simpleDNA: clay(C.strandA, {roughness: 0.5}),
   rung: clay(C.rung),
-  core: clay(C.core, {roughness: 0.7}),
+  core: clay(C.core),
   tail: clay(C.core),
   ac: clay(C.markBlue),
   me3: clay(C.coral),

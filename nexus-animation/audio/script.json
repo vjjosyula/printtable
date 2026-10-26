@@ -1,91 +1,86 @@
 [
  {
   "start": 0.4,
-  "say": "Every cell in your body carries the same DNA.",
-  "show": "Every cell in your body carries the same DNA."
+  "say": "In the brain, neurons, astrocytes, oligodendrocytes and microglia all carry the same DNA.",
+  "show": "In the brain, neurons, astrocytes, oligodendrocytes and microglia all carry the same DNA.",
+  "speed": 1.05
  },
  {
-  "start": 3.6,
-  "say": "About two metres of it, wrapped around proteins called histones, like thread on spools.",
-  "show": "About two metres of it, wrapped around proteins called histones, like thread on spools."
+  "start": 7.0,
+  "say": "Yet each cell type reads different genes.",
+  "show": "Yet each cell type reads different genes.",
+  "speed": 1.05
  },
  {
   "start": 10.2,
-  "say": "Small chemical marks on histone tails decide which genes are read.",
-  "show": "Small chemical marks on histone tails decide which genes are read."
+  "say": "Grind the tissue together, and those signals are diluted.",
+  "show": "Grind the tissue together, and those signals are diluted.",
+  "speed": 1.05
  },
  {
-  "start": 14.3,
-  "say": "Here, an enzyme adds an activating mark, H3 K27 acetylation.",
-  "show": "Here, an enzyme adds an activating mark, H3K27ac."
+  "start": 17.8,
+  "say": "Inside every nucleus, DNA is wrapped around proteins called histones.",
+  "show": "Inside every nucleus, DNA is wrapped around proteins called histones.",
+  "speed": 1.05
  },
  {
-  "start": 19.8,
-  "say": "The nucleosomes slide apart, so polymerase can read the gene.",
-  "show": "The nucleosomes slide apart, so polymerase can read the gene."
+  "start": 24.9,
+  "say": "Small marks on histone tails decide which genes are read.",
+  "show": "Small marks on histone tails decide which genes are read.",
+  "speed": 1.05
  },
  {
-  "start": 24.2,
-  "say": "Elsewhere, H3 K27 tri-methylation packs the DNA tightly.",
-  "show": "Elsewhere, H3K27me3 packs the DNA tightly."
+  "start": 30.0,
+  "say": "H3 K27 acetylation opens the DNA, so the gene can be read.",
+  "show": "H3K27ac opens the DNA, so the gene can be read.",
+  "speed": 1.05
  },
  {
-  "start": 29.3,
-  "say": "The polymerase can't get in. The gene stays silent.",
-  "show": "The polymerase can't get in. The gene stays silent."
+  "start": 35.5,
+  "say": "H3 K27 tri-methylation packs it tightly, and the gene stays silent.",
+  "show": "H3K27me3 packs it tightly, and the gene stays silent.",
+  "speed": 1.05
  },
  {
-  "start": 32.5,
-  "say": "Zoom out, and every cell type has its own pattern of marks.",
-  "show": "Zoom out, and every cell type has its own pattern of marks."
+  "start": 41.0,
+  "say": "Histland reads two histone marks from one sample, in bulk or in single cells.",
+  "show": "HisTLAND\u00ae reads two histone marks from one sample, in bulk or in single cells.",
+  "speed": 1.05
  },
  {
-  "start": 36.0,
-  "say": "Neurons, astrocytes, oligodendrocytes and microglia each read different genes.",
-  "show": "Neurons, astrocytes, oligodendrocytes and microglia each read different genes."
- },
- {
-  "start": 41.6,
+  "start": 50.4,
   "say": "DNA methylation adds a second layer, written on the DNA itself.",
   "show": "DNA methylation adds a second layer, written on the DNA itself.",
-  "speed": 1.1
+  "speed": 1.05
  },
  {
-  "start": 46.0,
-  "say": "But most methods read one histone mark at a time, so on and off genes are measured in separate samples.",
-  "show": "But most methods read one histone mark at a time, so on and off genes are measured in separate samples."
- },
- {
-  "start": 52.0,
-  "say": "Methylation maps rely on bisulfite, which damages DNA, and on very deep sequencing.",
-  "show": "Methylation maps rely on bisulfite, which damages DNA, and on very deep sequencing.",
-  "speed": 1.1
- },
- {
-  "start": 58.3,
-  "say": "And the best methods stayed in the labs that built them.",
-  "show": "And the best methods stayed in the labs that built them."
- },
- {
-  "start": 65.0,
-  "say": "NEXUS Epigenomics was founded in Stockholm in 2024 to close these gaps,",
-  "show": "NEXUS Epigenomics was founded in Stockholm in 2024 to close these gaps,",
-  "speed": 1.1
- },
- {
-  "start": 70.65,
-  "say": "turning methods published in Nature Biotechnology into ready-to-use kits.",
-  "show": "turning methods published in Nature Biotechnology into ready-to-use kits.",
-  "speed": 1.1
- },
- {
-  "start": 75.9,
-  "say": "Histland reads two histone marks from one sample, in bulk or in single cells.",
-  "show": "HisTLAND reads two histone marks from one sample, in bulk or in single cells."
- },
- {
-  "start": 80.7,
+  "start": 56.5,
   "say": "Metland maps DNA methylation without bisulfite or antibodies.",
-  "show": "MeTLAND maps DNA methylation without bisulfite or antibodies."
+  "show": "MeTLAND\u00ae maps DNA methylation without bisulfite or antibodies.",
+  "speed": 1.05
+ },
+ {
+  "start": 66.4,
+  "say": "NEXUS Epigenomics, founded in Stockholm, turns published methods into ready-to-use kits.",
+  "show": "NEXUS Epigenomics, founded in Stockholm, turns published methods into ready-to-use kits.",
+  "speed": 1.1
+ },
+ {
+  "start": 72.6,
+  "say": "Ready to run in your own lab.",
+  "show": "Ready to run in your own lab.",
+  "speed": 1.05
+ },
+ {
+  "start": 78.4,
+  "say": "Two layers of the epigenome. Histland and Metland.",
+  "show": "Two layers of the epigenome. HisTLAND\u00ae and MeTLAND\u00ae.",
+  "speed": 1.05
+ },
+ {
+  "start": 86.3,
+  "say": "What is the question you are solving in epigenetics?",
+  "show": "What is the question you are solving in epigenetics?",
+  "speed": 1.05
  }
 ]

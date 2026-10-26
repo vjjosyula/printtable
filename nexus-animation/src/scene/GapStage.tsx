@@ -10,21 +10,13 @@ import {FPS} from '../lib/timeline';
 import {C} from '../lib/brand';
 import {clay, M} from './materials';
 import {tailPoints} from './tails';
-import {gapOrigin, GAP_T0} from './view';
+import {gapOrigin, GAP_T0, STAGE} from './view';
 
 /**
- * The gap beats, the kit hand-off and the two kit cards, staged along +x inside one neuron nucleus.
- * Everything here runs on video seconds.
+ * The kit stage after the chromatin story, staged along +x beside the chromatin, on video seconds:
+ * HisTLAND® (two marks read together) -> methylation appears -> MeTLAND® -> kits reach many labs -> two layers.
  */
-export const GAP = {
-  vignette: 0, // three nucleosomes: methylation beat + "one mark at a time"
-  tubes: 70, // two separate experiments
-  harsh: 150, // harsh chemistry
-  reads: 198, // tall stack of sequencing reads
-  labs: 360, // one lab bench, many labs around it
-  histland: 560,
-  metland: 706,
-};
+export const GAP = STAGE;
 
 const v3 = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
 const win = (t: number, a: number, b: number) => t >= a && t <= b;
@@ -36,9 +28,8 @@ const markGeo = new THREE.SphereGeometry(0.85, 24, 16);
 const lollyGeo = new THREE.SphereGeometry(0.62, 18, 12);
 const stalkGeo = new THREE.CylinderGeometry(0.14, 0.14, 1, 6);
 const boxGeo = new THREE.BoxGeometry(1, 1, 1);
-const methylMat = clay(C.tealLight, {roughness: 0.4, emissive: new THREE.Color(C.tealLight), emissiveIntensity: 0.15});
+const methylMat = clay(C.teal, {roughness: 0.4});
 const readerMat = clay(C.markBlue, {roughness: 0.38, clearcoat: 0.5});
-const me3Fade = M.me3.clone();
 const readerCoralMat = clay(C.coral, {roughness: 0.38, clearcoat: 0.5});
 
 function useDisposable<T extends {dispose: () => void}>(make: () => T, deps: unknown[]): T {
@@ -181,8 +172,8 @@ function readerPose(mark: THREE.Vector3, dir: THREE.Vector3, t: number, tIn: num
 }
 
 /* ---------------------------------------------------------------- tubes and tracks */
-const glassMat = new THREE.MeshPhysicalMaterial({color: '#DCE3EA', roughness: 0.12, metalness: 0, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide, clearcoat: 1});
-const rimMat = clay('#C9D2DA', {roughness: 0.3});
+const glassMat = new THREE.MeshPhysicalMaterial({color: '#AFC0CF', roughness: 0.12, metalness: 0, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide, clearcoat: 1});
+const rimMat = clay('#8E9BA6', {roughness: 0.3});
 const tubeBody = (() => {
   const pts: THREE.Vector2[] = [];
   for (let k = 0; k <= 10; k++) {
@@ -235,7 +226,7 @@ const Track: React.FC<{pos: THREE.Vector3; width: number; height: number; color:
 };
 
 /* ---------------------------------------------------------------- read stacks */
-const readMats = ['#E9E4C6', '#D3CDAE', '#BDB79A', '#FBF9F6'].map((c) => clay(c, {roughness: 0.55}));
+const readMats = ['#C9C09A', '#B8AE86', '#D8CFAA', '#9FB7C9'].map((c) => clay(c, {roughness: 0.55}));
 type ReadStackProps = {pos: THREE.Vector3; cols: number; rows: number; p: number; seed: number};
 const ReadStack: React.FC<ReadStackProps> = ({pos, cols, rows, p, seed}) => {
   const meshes = useMemo(() => {
@@ -314,14 +305,12 @@ function glowTexture() {
 }
 let sheetMat: THREE.MeshBasicMaterial | null = null;
 let glowTex: THREE.Texture | null = null;
-const glowMat = (color: string) => new THREE.SpriteMaterial({map: (glowTex ??= glowTexture()), color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false});
-const benchMat = clay('#5A636C', {roughness: 0.7});
-const floorMat = clay('#2A3035', {roughness: 0.95});
-const floorGeo = new THREE.CircleGeometry(68, 64);
-const benchHero = clay('#6B7580', {roughness: 0.6});
-const flaskDim = clay('#3E5E5A', {roughness: 0.4});
-const flaskLit = clay(C.tealLight, {roughness: 0.3, emissive: new THREE.Color(C.tealLight), emissiveIntensity: 0.6});
-const requestMat = clay('#FBF9F6', {roughness: 0.5});
+// on the light background a soft normal-blended halo reads better than an additive glow
+const glowMat = (color: string) => new THREE.SpriteMaterial({map: (glowTex ??= glowTexture()), color, transparent: true, opacity: 0.55, depthWrite: false, fog: false});
+const benchMat = clay('#8F99A3', {roughness: 0.7});
+const benchHero = clay('#6E7983', {roughness: 0.6});
+const flaskDim = clay('#B9C9C5', {roughness: 0.4});
+const flaskLit = clay(C.teal, {roughness: 0.3, emissive: new THREE.Color(C.teal), emissiveIntensity: 0.3});
 const kitBody = clay(C.sand, {roughness: 0.5});
 const kitLid = clay(C.blue, {roughness: 0.45});
 const kitBand = clay(C.teal, {roughness: 0.45});
@@ -351,32 +340,16 @@ const arc = (a: THREE.Vector3, b: THREE.Vector3, u: number, h: number) => a.clon
 
 const LabScene: React.FC<{t: number}> = ({t}) => {
   sheetMat ??= new THREE.MeshBasicMaterial({map: sheetTexture(), toneMapped: false});
-  const sheetGlow = useMemo(() => glowMat(C.keyword), []);
-  const labGlows = useMemo(() => Array.from({length: LAB_N}, () => glowMat(C.tealLight)), []);
+  const sheetGlow = useMemo(() => glowMat('#8DB3E2'), []);
+  const labGlows = useMemo(() => Array.from({length: LAB_N}, () => glowMat(C.teal)), []);
   const centre = v3(0, 0, 0);
   const sheetPos = v3(0, 6.6, 1.2);
-  const toKit = rt(t, 65.3, 66.3);
-  const pileFade = 1 - rt(t, 66.4, 67.4);
-  // requests: one after another from the labs, landing in a growing pile beside the bench
-  const REQ = 36;
-  const reqs: React.ReactNode[] = [];
-  for (let k = 0; k < REQ; k++) {
-    const t0 = 59.3 + k * 0.14;
-    if (t < t0) continue;
-    const from = labPos(k % LAB_N).add(v3(0, 1.5, 0));
-    const rnd = mulberry32(100 + k);
-    const slot = v3(17 + (k % 2) * 5 + (rnd() - 0.5) * 1.2, -8.8 + Math.floor(k / 2) * 0.8, 6 + (rnd() - 0.5) * 1.6);
-    const u = clamp((t - t0) / 1.0);
-    const p = arc(from, slot, easeInOutCubic(u), 20);
-    const s = pileFade;
-    if (s <= 0.01) continue;
-    reqs.push(<mesh key={k} geometry={boxGeo} material={requestMat} position={p} rotation={[0, (rnd() - 0.5) * 0.8 + u * 2 * (1 - u), (rnd() - 0.5) * 0.15]} scale={[4.4 * s, 0.6 * s, 3.0 * s]} />);
-  }
-  // kits: one per lab, flying out from the centre
+  // the published protocol glows, becomes a kit, and copies travel out to every lab
+  const toKit = rt(t, 68.0, 69.0);
   const kits: React.ReactNode[] = [];
   const lit: number[] = [];
   for (let i = 0; i < LAB_N; i++) {
-    const t0 = 66.4 + i * 0.28;
+    const t0 = 69.4 + i * 0.32;
     const u = clamp((t - t0) / 1.2);
     lit.push(rt(t, t0 + 1.0, t0 + 1.6));
     if (t < t0) continue;
@@ -386,7 +359,6 @@ const LabScene: React.FC<{t: number}> = ({t}) => {
   return (
     <group>
       <Bench pos={centre} scale={1.9} mat={benchHero} />
-      <mesh geometry={floorGeo} material={floorMat} position={[0, -9.6, 0]} rotation={[-Math.PI / 2, 0, 0]} />
       {toKit < 1 ? (
         <group position={sheetPos} rotation={[-0.35, 0, 0]} scale={1 - toKit}>
           <mesh material={sheetMat}>
@@ -394,7 +366,7 @@ const LabScene: React.FC<{t: number}> = ({t}) => {
           </mesh>
         </group>
       ) : null}
-      <sprite material={sheetGlow} position={sheetPos} scale={[44, 44, 1]} />
+      <sprite material={sheetGlow} position={sheetPos} scale={[44 * (1 - 0.5 * toKit), 44 * (1 - 0.5 * toKit), 1]} />
       <Kit pos={sheetPos.clone().add(v3(0, -2.6 + 2.6 * easeOutBack(toKit), 0))} s={easeOutBack(toKit) * 1.7} />
       {Array.from({length: LAB_N}, (_, i) => {
         const p = labPos(i);
@@ -407,50 +379,51 @@ const LabScene: React.FC<{t: number}> = ({t}) => {
           </group>
         );
       })}
-      {reqs}
       {kits}
     </group>
   );
 };
 
 /* ---------------------------------------------------------------- the stage */
+const notIntoCore = (nucs: Nuc[]) => (l: Lolly) => {
+  // keep methyl groups that point away from the nearest histone core (no clipping into the octamer)
+  const n = nucs.reduce((a, c) => (l.base.distanceTo(c.C) < l.base.distanceTo(a.C) ? c : a), nucs[0]);
+  return l.tip.distanceTo(n.C) > l.base.distanceTo(n.C) + 0.6;
+};
 let built: ReturnType<typeof build> | null = null;
 function build() {
-  // beat 1: three nucleosomes; the middle one carries one active and one repressive mark
-  const vNucs = [makeNuc(301, v3(-27, 1, -1), 0.5), makeNuc(302, v3(0, 0, 0.5), 2.7, ['ac', 'me3']), makeNuc(303, v3(27, -1, 0), 4.7)];
-  const vCl = buildCenterline(vNucs, 30, 30);
-  const vAnchor = vCl.dyadS.get(302)!;
-  const vLollies = lollipops(vCl, vAnchor, 46, 31, 6).filter((l) => {
-    // keep the methyl groups that point away from the histone cores (no clipping into the octamer)
-    const n = vNucs.reduce((a, c) => (l.base.distanceTo(c.C) < l.base.distanceTo(a.C) ? l.base.distanceTo(c.C) < 1e9 ? c : a : a), vNucs[0]);
-    return l.tip.distanceTo(n.C) > l.base.distanceTo(n.C) + 0.6;
-  });
-  // beat 2: a methylated stretch cut into pieces (they fray apart after the harsh treatment)
-  const PIECES = 6;
-  const PL = 8.2;
-  const pieces = Array.from({length: PIECES}, (_, i) => {
-    const cl = lineCenterline([v3(-PL / 2, 0, 0), v3(0, 0.15 * Math.sin(i), 0), v3(PL / 2, 0, 0)]);
-    return {cl, lollies: lollipops(cl, 0, 2, 50 + i, 1.4), anchor: i * PL};
-  });
-  // HisTLAND card: one nucleosome, both marks
+  // HisTLAND®: one nucleosome carrying an active and a repressive mark
   const hNuc = makeNuc(310, v3(0, 0, 0), 2.7, ['ac', 'me3']);
   const hCl = buildCenterline([hNuc], 16, 16);
-  // MeTLAND card: intact DNA with methyl groups
+  // methylation: three nucleosomes, methyl groups appear along the DNA
+  const vNucs = [makeNuc(301, v3(-27, 1, -1), 0.5), makeNuc(302, v3(0, 0, 0.5), 2.7), makeNuc(303, v3(27, -1, 0), 4.7)];
+  const vCl = buildCenterline(vNucs, 30, 30);
+  const vAnchor = vCl.dyadS.get(302)!;
+  const vLollies = lollipops(vCl, vAnchor, 46, 31, 6).filter(notIntoCore(vNucs));
+  // MeTLAND®: intact methylated DNA
   const mCl = lineCenterline([v3(-17, -0.5, 0), v3(-6, 0.8, 0.5), v3(6, -0.6, -0.4), v3(17, 0.4, 0)]);
   const mLollies = lollipops(mCl, 0, 9, 77, 2);
-  return {vNucs, vCl, vAnchor, vLollies, pieces, PL, hNuc, hCl, mCl, mLollies};
+  // two layers: two nucleosomes with histone marks, and methyl groups on the same DNA
+  const lNucs = [makeNuc(321, v3(-12, 0.5, 0), 0.9, ['ac', null, 'ac']), makeNuc(322, v3(12, -0.5, 0.3), 3.4, ['me3', 'me3'])];
+  const lCl = buildCenterline(lNucs, 20, 20);
+  const lAnchor = lCl.dyadS.get(321)!;
+  const lLollies = lollipops(lCl, lAnchor, 30, 55, 4).filter(notIntoCore(lNucs));
+  return {hNuc, hCl, vNucs, vCl, vAnchor, vLollies, mCl, mLollies, lNucs, lCl, lAnchor, lLollies};
 }
 export const gapBuilt = () => (built ??= build());
 
-/** World-space anchors used by overlay labels and tags. */
+/** World-space anchors used by overlay tags. */
 export function gapAnchors() {
   const b = gapBuilt();
   const o = gapOrigin();
+  const at = (x: number, p: THREE.Vector3) => p.clone().add(v3(x, 0, 0)).add(o);
+  // pick the methyl group nearest the middle of the two-layers DNA for its tag
+  const lm = b.lLollies.reduce((a, l) => (Math.abs(l.s - 0.5) < Math.abs(a.s - 0.5) ? l : a), b.lLollies[0]);
   return {
-    histMark: tip(b.hNuc, 0).add(v3(GAP.histland, 0, 0)).add(o),
-    metMethyl: b.mLollies[5].tip.clone().add(v3(GAP.metland, 0, 0)).add(o),
-    tube1: v3(GAP.tubes - 10, -12, 0).add(o),
-    tube2: v3(GAP.tubes + 10, -12, 0).add(o),
+    histMark: at(GAP.histland, tip(b.hNuc, 0)),
+    metMethyl: at(GAP.metland, b.mLollies[5].tip),
+    layersMark: at(GAP.layers, tip(b.lNucs[0], 0)),
+    layersMethyl: at(GAP.layers, lm.tip),
   };
 }
 
@@ -460,86 +433,24 @@ export const GapStage: React.FC = () => {
   const b = gapBuilt();
   const o = gapOrigin();
 
-  /* beat 1 ----------------------------------------------------------- */
-  const mid = b.vNucs[1];
-  const acTip = tip(mid, 0);
-  const meTip = tip(mid, 1);
-  const acDir = acTip.clone().sub(mid.C).normalize().multiplyScalar(0.5).add(v3(0, 1, 0.45)).normalize();
-  const reader = readerPose(acTip, acDir, t, 45.7, 47.5);
-  const coralO = 1 - rt(t, 46.9, 47.9);
-  me3Fade.transparent = coralO < 1;
-  me3Fade.opacity = coralO;
-  const marksIn = rt(t, 44.9, 45.5, easeOutBack);
-  const methylShow = (l: Lolly) => rt(t, 42.4 + l.s * 2.0, 42.4 + l.s * 2.0 + 0.4, (x) => x);
-
-  /* tubes -------------------------------------------------------------- */
-  const tubeIn = rt(t, 47.9, 48.7, easeOutBack);
-  const fill1 = rt(t, 48.4, 49.6);
-  const fill2 = rt(t, 48.9, 50.1);
-
-  /* beat 2 ------------------------------------------------------------- */
-  const travel = rt(t, 52.3, 55.4, (x) => x) * 52;
-  const boxPulse = 1 + 0.03 * Math.sin(t * 9);
-  const readsP = rt(t, 54.6, 57.9, (x) => 1 - Math.pow(1 - x, 1.6));
-
-  /* kit cards ---------------------------------------------------------- */
+  /* HisTLAND®: both marks read together from one sample ---------------- */
   const hAc = tip(b.hNuc, 0);
   const hMe = tip(b.hNuc, 1);
   const fromAbove = (m: THREE.Vector3) => m.clone().sub(b.hNuc.C).normalize().multiplyScalar(0.5).add(v3(0, 1, 0.45)).normalize();
-  const hReadA = readerPose(hAc, fromAbove(hAc), t, 75.6);
-  const hReadB = readerPose(hMe, fromAbove(hMe), t, 75.75);
-  const hTube = rt(t, 76.8, 77.5, easeOutBack);
-  const hFill = rt(t, 77.0, 78.2);
-  const mReads = rt(t, 81.4, 82.8, (x) => x);
+  const hReadA = readerPose(hAc, fromAbove(hAc), t, 42.4);
+  const hReadB = readerPose(hMe, fromAbove(hMe), t, 42.55);
+  const hTube = rt(t, 43.6, 44.3, easeOutBack);
+  const hFill = rt(t, 43.8, 45.0);
+
+  /* methylation appears -------------------------------------------------- */
+  const methylShow = (l: Lolly) => rt(t, 51.0 + l.s * 2.6, 51.0 + l.s * 2.6 + 0.4, (x) => x);
+
+  /* MeTLAND®: intact DNA, a short stack of reads ------------------------- */
+  const mReads = rt(t, 58.6, 60.2, (x) => x);
 
   return (
     <group position={o}>
-      {win(t, GAP_T0, 51.8) ? (
-        <group position={[GAP.vignette, 0, 0]}>
-          <DNA cl={b.vCl} anchor={b.vAnchor} lollies={b.vLollies} show={methylShow} />
-          <Nucleosomes nucs={b.vNucs} />
-          {marksIn > 0 ? <mesh geometry={markGeo} material={M.ac} position={reader.carried ?? acTip} scale={marksIn} /> : null}
-          {marksIn > 0 && coralO > 0.01 ? <mesh geometry={markGeo} material={me3Fade} position={meTip} scale={marksIn} /> : null}
-          {reader.visible ? <mesh geometry={readerGeo} material={readerMat} position={reader.pos} quaternion={reader.q} /> : null}
-        </group>
-      ) : null}
-      {win(t, 47.6, 52.6) ? (
-        <group position={[GAP.tubes, 0, 0]}>
-          <SampleTube pos={v3(-10, -4, 0)} layers={[liqBlue]} fill={fill1} s={tubeIn} />
-          <SampleTube pos={v3(10, -4, 0)} layers={[liqCoral]} fill={fill2} s={tubeIn} />
-          <Track pos={v3(-10, 6.5, 0)} width={15} height={6} color={C.markBlue} prof={PROFILES.ac} p={rt(t, 48.6, 50.2, (x) => x)} />
-          <Track pos={v3(10, 6.5, 0)} width={15} height={6} color={C.coral} prof={PROFILES.me3} p={rt(t, 49.2, 50.8, (x) => x)} />
-        </group>
-      ) : null}
-      {win(t, 50.6, 59.8) ? (
-        <group>
-          <group position={[GAP.harsh, 0, 0]}>
-            <mesh geometry={boxGeo} material={harshMat} scale={[14 * boxPulse, 14 * boxPulse, 14 * boxPulse]} renderOrder={6} />
-            <lineSegments geometry={harshEdges} material={harshLine} scale={14 * boxPulse} />
-          </group>
-          {b.pieces.map((pc, i) => {
-            // pieces travel left to right; once out of the box they break apart and drift
-            const x = GAP.harsh - 14 - i * b.PL + travel;
-            const rnd = mulberry32(400 + i);
-            const fray = clamp((x - (GAP.harsh + 6)) / 14);
-            const e = easeOutCubic(fray);
-            const pos = v3(x + e * i * 0.8, e * (rnd() - 0.5) * 16, e * (rnd() - 0.5) * 12);
-            const rot = new THREE.Euler(e * (rnd() - 0.5) * 2.4, e * (rnd() - 0.5) * 1.6, e * (rnd() - 0.5) * 2.0);
-            return (
-              <group key={i} position={pos} rotation={rot}>
-                <DNA cl={pc.cl} anchor={pc.anchor} lollies={pc.lollies} />
-              </group>
-            );
-          })}
-          <ReadStack pos={v3(GAP.reads, -10, 0)} cols={4} rows={140} p={readsP} seed={5} />
-        </group>
-      ) : null}
-      {win(t, 57.6, 76.2) ? (
-        <group position={[GAP.labs, 0, 0]}>
-          <LabScene t={t} />
-        </group>
-      ) : null}
-      {win(t, 74.4, 81.8) ? (
+      {win(t, GAP_T0, 51.2) ? (
         <group position={[GAP.histland, 0, 0]}>
           <DNA cl={b.hCl} anchor={b.hCl.dyadS.get(310)!} />
           <Nucleosomes nucs={[b.hNuc]} />
@@ -548,20 +459,36 @@ export const GapStage: React.FC = () => {
           {hReadA.visible ? <mesh geometry={readerGeo} material={readerMat} position={hReadA.pos} quaternion={hReadA.q} /> : null}
           {hReadB.visible ? <mesh geometry={readerGeo} material={readerCoralMat} position={hReadB.pos} quaternion={hReadB.q} /> : null}
           <SampleTube pos={v3(17, -4, 0)} layers={[liqBlue, liqCoral]} fill={hFill} s={hTube} />
-          <Track pos={v3(17, 9.5, 0)} width={12} height={3.2} color={C.markBlue} prof={PROFILES.ac} p={rt(t, 77.4, 78.8, (x) => x)} />
-          <Track pos={v3(17, 5.6, 0)} width={12} height={3.2} color={C.coral} prof={PROFILES.me3} p={rt(t, 77.6, 79.0, (x) => x)} />
+          <Track pos={v3(17, 9.5, 0)} width={12} height={3.2} color={C.markBlue} prof={PROFILES.ac} p={rt(t, 44.2, 45.6, (x) => x)} />
+          <Track pos={v3(17, 5.6, 0)} width={12} height={3.2} color={C.coral} prof={PROFILES.me3} p={rt(t, 44.4, 45.8, (x) => x)} />
         </group>
       ) : null}
-      {win(t, 79.6, 90.1) ? (
+      {win(t, 49.0, 57.6) ? (
+        <group position={[GAP.methyl, 0, 0]}>
+          <DNA cl={b.vCl} anchor={b.vAnchor} lollies={b.vLollies} show={methylShow} />
+          <Nucleosomes nucs={b.vNucs} />
+        </group>
+      ) : null}
+      {win(t, 55.4, 67.6) ? (
         <group position={[GAP.metland, 0, 0]}>
           <DNA cl={b.mCl} lollies={b.mLollies} />
           <ReadStack pos={v3(6, -12, 0)} cols={2} rows={8} p={mReads} seed={9} />
         </group>
       ) : null}
+      {win(t, 65.0, 79.6) ? (
+        <group position={[GAP.labs, 0, 0]}>
+          <LabScene t={t} />
+        </group>
+      ) : null}
+      {win(t, 76.8, 90.1) ? (
+        <group position={[GAP.layers, 0, 0]}>
+          <DNA cl={b.lCl} anchor={b.lAnchor} lollies={b.lLollies} />
+          <Nucleosomes nucs={b.lNucs} />
+          {b.lNucs.flatMap((n) =>
+            n.tails.map((tl, i) => (tl.mark ? <mesh key={`${n.id}-${i}`} geometry={markGeo} material={tl.mark === 'ac' ? M.ac : M.me3} position={tip(n, i)} /> : null)),
+          )}
+        </group>
+      ) : null}
     </group>
   );
 };
-
-const harshMat = new THREE.MeshPhysicalMaterial({color: C.coral, emissive: new THREE.Color(C.coral), emissiveIntensity: 0.35, roughness: 0.4, transparent: true, opacity: 0.42, depthWrite: false});
-const harshEdges = new THREE.EdgesGeometry(boxGeo);
-const harshLine = new THREE.LineBasicMaterial({color: '#F08A70'});

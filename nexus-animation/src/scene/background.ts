@@ -24,13 +24,16 @@ export function brandBackground(w: number, h: number) {
     g.fillStyle = grad;
     g.fillRect(0, 0, w, h);
   };
-  // deep warm charcoal with a slightly lighter haze towards the centre (the distance)
-  const v = g.createRadialGradient(w / 2, h * 0.55, 0, w / 2, h * 0.55, Math.max(w, h) * 0.75);
-  v.addColorStop(0, C.haze);
-  v.addColorStop(1, C.bg);
+  wash(w * 0.5, h * 0.5, Math.max(w, h) * 0.9, C.panel, 0); // keep centre clean
+  wash(-w * 0.05, -h * 0.02, w * 0.85, C.blue, 0.10);
+  wash(w * 1.05, h * 0.35, w * 0.7, C.teal, 0.08);
+  wash(w * 0.15, h * 1.02, w * 0.9, C.sand, 0.55);
+  // vignette to the light panel colour at the edges
+  const v = g.createRadialGradient(w / 2, h * 0.48, Math.min(w, h) * 0.35, w / 2, h * 0.48, Math.max(w, h) * 0.8);
+  v.addColorStop(0, 'rgba(244,241,236,0)');
+  v.addColorStop(1, 'rgba(244,241,236,0.9)');
   g.fillStyle = v;
   g.fillRect(0, 0, w, h);
-  void wash;
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   cache.set(key, tex);
@@ -41,15 +44,14 @@ export function brandBackground(w: number, h: number) {
  * Deep NEXUS-blue backdrop used while the camera is among the cells. It crossfades in after we leave the
  * neuron and back out as the signal tracks rise, so tracks and text always sit on the light background.
  */
-export const darkAmount = (_f: number) => {
-  return 0;
-}
-export const _unusedDark = (f: number) => {
+export const darkAmount = (f: number) => {
   const sm = (a: number, b: number, x: number) => {
     const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
     return t * t * (3 - 2 * t);
   };
-  return sm(468, 520, f) * (1 - sm(586, 632, f));
+  void sm;
+  void f;
+  return 0; // light throughout (no deep blue tissue backdrop)
 };
-export const DARK_CENTER = new THREE.Color(C.haze);
-export const DARK_EDGE = new THREE.Color(C.bg);
+export const DARK_CENTER = new THREE.Color(C.blue).lerp(new THREE.Color(C.bg), 0.08);
+export const DARK_EDGE = new THREE.Color(C.blue).lerp(new THREE.Color(C.charcoal), 0.55);

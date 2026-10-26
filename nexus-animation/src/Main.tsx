@@ -10,7 +10,8 @@ import {Chromatin} from './scene/Chromatin';
 import {Nucleus} from './scene/Nucleus';
 import {Tissue} from './scene/Tissue';
 import {GapStage} from './scene/GapStage';
-import {GAP_T0} from './scene/view';
+import {GAP_T0, viewAt} from './scene/view';
+import {INTRO_END} from './lib/timeline';
 import {brandBackground} from './scene/background';
 import {Overlay} from './Overlay';
 import {useCurrentFrame} from 'remotion';
@@ -20,9 +21,11 @@ export const Main: React.FC = () => {
   const {width, height} = useVideoConfig();
   const f = useStoryFrame();
   const t = useCurrentFrame() / 30;
-  const dist = cameraAt(f).dist;
+  const dist = viewAt(useCurrentFrame()).dist;
   const detail = dist < 600;
-  const showChromatin = dist < 9000 && f < 700 && t < GAP_T0;
+  const showChromatin = dist < 9000 && t > INTRO_END - 1.7 && t < GAP_T0 + 1.6;
+  // the nucleus around the chromatin: during the dive in, and in the background late in the chromatin story
+  const showNucleus = (t > 12 && t < INTRO_END + 0.5) || (f >= 300 && t < GAP_T0);
   return (
     <AbsoluteFill style={{background: C.bg}}>
       <ThreeCanvas
@@ -38,7 +41,7 @@ export const Main: React.FC = () => {
         <fog attach="fog" args={[C.bg, 100, 600]} />
         <Lights />
         {showChromatin ? <Chromatin detail={detail} /> : null}
-        {f >= 300 && f < 600 && t < GAP_T0 ? <Nucleus /> : null}
+        {showNucleus ? <Nucleus /> : null}
         <Tissue />
         <GapStage />
         <Rig />

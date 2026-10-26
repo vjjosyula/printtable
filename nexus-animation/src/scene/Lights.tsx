@@ -13,11 +13,11 @@ export const Lights: React.FC = () => {
   const fill = s.pos.clone().add({x: 0.9 * d, y: -0.2 * d, z: 0} as never);
   return (
     <>
-      <hemisphereLight args={['#ffffff', '#2E3439', 1.7]} />
-      <directionalLight position={key} target-position={s.target} intensity={1.6} color="#fffaf2" />
+      <hemisphereLight args={['#ffffff', '#E9E4C6', 1.85]} />
+      <directionalLight position={key} target-position={s.target} intensity={1.35} color="#fffaf2" />
       <directionalLight position={fill} target-position={s.target} intensity={0.45} color="#f4f1ec" />
       {/* rim light from behind gives molecules a crisp edge against the bright background */}
-      <directionalLight position={s.target.clone().add(s.target.clone().sub(s.pos).multiplyScalar(1.2)).add({x: 0, y: 0.6 * d, z: 0} as never)} target-position={s.target} intensity={1.5} color="#ffffff" />
+      <directionalLight position={s.target.clone().add(s.target.clone().sub(s.pos).multiplyScalar(1.2)).add({x: 0, y: 0.6 * d, z: 0} as never)} target-position={s.target} intensity={0.9} color="#ffffff" />
     </>
   );
 };

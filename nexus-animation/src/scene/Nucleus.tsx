@@ -5,7 +5,8 @@ import {useCurrentFrame} from 'remotion';
 import {C} from '../lib/brand';
 import {tubeGeometry} from '../lib/geom';
 import {mulberry32, smoothstep} from '../lib/math';
-import {cameraAt, NUCLEUS_CENTER, TISSUE_K} from './camera';
+import {NUCLEUS_CENTER, TISSUE_K} from './camera';
+import {viewAt} from './view';
 import {clay} from './materials';
 import {MergeHelper} from './Chromatin';
 
@@ -82,8 +83,9 @@ const poreGeo = new THREE.TorusGeometry(26, 9, 10, 24);
 const beadGeo = new THREE.SphereGeometry(7.5, 12, 8);
 beadGeo.scale(1, 1, 0.65);
 
-const stringMats = Object.fromEntries([C.strandA, C.strandB, CORAL_TINT].map((c) => [c, clay(c)])) as Record<string, THREE.MeshPhysicalMaterial>;
-const beadMat = clay(C.core);
+// a touch deeper than the DNA tints so the fibres read against the light background during the dive
+const stringMats = Object.fromEntries([C.strandA, C.strandB, CORAL_TINT].map((c) => [c, clay(new THREE.Color(c).multiplyScalar(0.82).getStyle())])) as Record<string, THREE.MeshPhysicalMaterial>;
+const beadMat = clay('#D5CEAE');
 const envMat = clay(C.panel, {side: THREE.DoubleSide});
 const poreMat = clay(C.sand);
 const nucleolusMat = clay(C.sand);
@@ -136,7 +138,7 @@ export const Nucleus: React.FC = () => {
     return im;
   }, []);
 
-  const cam = cameraAt(f);
+  const cam = viewAt(useCurrentFrame());
   // cut-away: remove the cap facing the camera while we are close, close it as we leave
   const n = cam.pos.clone().sub(NUCLEUS_CENTER).normalize();
   const cut = 0.2 + 0.9 * smoothstep(Math.log(9000), Math.log(30000), Math.log(cam.dist));
@@ -144,7 +146,7 @@ export const Nucleus: React.FC = () => {
   clipPlane.set(n.clone().negate(), n.dot(P0));
   // nucleus takes on the neuron colour once seen from outside the cell
   const out = smoothstep(Math.log(5000), Math.log(20000), Math.log(cam.dist));
-  envMat.color.set(C.haze).lerp(new THREE.Color('#A3306F'), out);
+  envMat.color.set(C.panel).lerp(new THREE.Color(C.magenta), out);
   const pulse = 1 + 0.035 * Math.sin((f - 400) * 0.16) * out;
   const visible = cam.dist < 60 ? false : true;
   return (

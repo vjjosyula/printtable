@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {useStoryFrame} from '../lib/timeline';
+import {INTRO_END} from '../lib/timeline';
 import * as THREE from 'three';
 import {useCurrentFrame} from 'remotion';
 import {C} from '../lib/brand';
@@ -246,40 +246,40 @@ export function repCell(type: CellType) {
 /** Light denim blue for neurons (a lighter, cleaner relative of the brand blue). */
 const NEURON_BLUE = C.magenta;
 const bodyMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
-  neuron: clay(NEURON_BLUE, {roughness: 0.5, clearcoat: 0.25, clearcoatRoughness: 0.5, emissive: new THREE.Color(C.magenta), emissiveIntensity: 0.18}),
-  astro: clay(C.tealLight),
-  oligo: clay('#BDB79A'),
-  micro: clay('#A84A36'),
-};
-const accentMat = clay(C.sand, {roughness: 0.35, clearcoat: 0.4});
-const BODY_TINT: Record<CellType, number> = {neuron: 0, astro: 0, oligo: 0, micro: 0};
-const NUC_LIFT: Record<CellType, number> = {neuron: 0, astro: 0.42, oligo: 0.36, micro: 0.2};
-const offWhite = new THREE.Color(C.bg);
-const nucMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
-  neuron: clay('#B0307A'),
-  astro: clay('#1F7E72'),
+  neuron: clay(NEURON_BLUE, {roughness: 0.45, clearcoat: 0.35, clearcoatRoughness: 0.4}),
+  astro: clay(C.teal),
   oligo: clay(C.sand),
   micro: clay(C.coral),
 };
-const outlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true, visible: false});
-const nucOutlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true, visible: false});
+const accentMat = clay('#D8CB98', {roughness: 0.35, clearcoat: 0.4});
+const BODY_TINT: Record<CellType, number> = {neuron: 0, astro: 0.2, oligo: 0, micro: 0.18};
+const NUC_LIFT: Record<CellType, number> = {neuron: 0, astro: 0.42, oligo: 0.36, micro: 0.2};
+const offWhite = new THREE.Color(C.bg);
+const nucMats: Record<CellType, THREE.MeshPhysicalMaterial> = {
+  neuron: clay('#2F5F98'),
+  astro: clay(C.teal),
+  oligo: clay(C.sand),
+  micro: clay(C.coral),
+};
+const outlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true});
+const nucOutlineMat = new THREE.MeshBasicMaterial({color: C.charcoal, side: THREE.BackSide, transparent: true});
 const sphere = new THREE.SphereGeometry(1, 32, 24);
 // cells merge towards a soft light blue (the grey is kept for the averaged signal track only)
-const grey = new THREE.Color(C.blue).lerp(new THREE.Color(C.bg), 0.55);
+const grey = new THREE.Color('#9AA6B4');
 
-/** Swirl / blend amount (scene 4) and fade-out (scene 5). */
-export const blendAmount = (f: number) => ramp(f, 640, 712, easeInOutCubic);
-const fadeOut = (f: number) => 1 - ramp(f, 752, 830, easeInOutCubic);
+/** Dilution beat (video seconds): the cell types swirl together, then separate again for the dive. */
+export const blendAmount = (t: number) => ramp(t, 10.2, 12.4, easeInOutCubic) * (1 - ramp(t, 13.2, 14.8, easeInOutCubic));
 
 export const Tissue: React.FC = () => {
-  const f = useStoryFrame();
   const vf = useCurrentFrame();
+  const vt = vf / 30;
+  const f = 560 + vt * 30; // gentle idle motion (pulse) on video time
   const cells = useMemo(getTissue, []);
   const cam = viewAt(vf);
-  if (f < 380 || f > 840 || cam.dist < 3000) return null;
-  const blend = blendAmount(f);
-  // surrounding cells fade in as the camera pulls back past them (no giant processes in front of the lens)
-  const fade = fadeOut(f) * smoothstep(Math.log(5000), Math.log(13000), Math.log(cam.dist) + (f > 600 ? 99 : 0));
+  if (vt > INTRO_END || cam.dist < 3000) return null;
+  const blend = blendAmount(vt);
+  // the cells fade out as the camera dives in past them (no giant processes in front of the lens)
+  const fade = smoothstep(Math.log(5000), Math.log(13000), Math.log(cam.dist));
   // neuron 0 contains the camera at first: fade it in as we leave it
   const leave = smoothstep(Math.log(9000), Math.log(22000), Math.log(cam.dist));
   for (const t of TYPES) {
@@ -294,9 +294,9 @@ export const Tissue: React.FC = () => {
   outlineMat.opacity = fade * (1 - blend * 0.6);
   accentMat.transparent = fade < 1;
   accentMat.opacity = fade;
-  accentMat.color.set(C.sand).lerp(grey, blend);
+  accentMat.color.set('#D8CB98').lerp(grey, blend);
   nucOutlineMat.opacity = fade * (1 - blend * 0.6);
-  const swirlT = (f - 640) / 30;
+  const swirlT = vt - 10.2;
   return (
     <group position={NUCLEUS_CENTER} scale={TISSUE_K}>
       {cells.map((c, i) => {

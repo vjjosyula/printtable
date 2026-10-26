@@ -4,7 +4,7 @@ import {useFrame, useThree} from '@react-three/fiber';
 import {getInputProps, useCurrentFrame} from 'remotion';
 import {DepthOfFieldEffect, EffectComposer, EffectPass, RenderPass, SMAAEffect} from 'postprocessing';
 import {N8AOPostPass} from 'n8ao';
-import {offsetAt, viewAt} from './view';
+import {fovFor, offsetAt, viewAt} from './view';
 import {C} from '../lib/brand';
 
 /** Positions the camera, fog and post-processing for the current frame and renders. */
@@ -27,7 +27,7 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     ao.configuration.denoiseSamples = preview ? 4 : 8;
     ao.configuration.halfRes = preview;
     ao.configuration.denoiseRadius = 12;
-    ao.configuration.color = new THREE.Color('#111416');
+    ao.configuration.color = new THREE.Color(C.charcoal);
     ao.configuration.gammaCorrection = false;
     composer.addPass(ao);
     const dof = new DepthOfFieldEffect(cam, {worldFocusDistance: 50, worldFocusRange: 40, bokehScale: 2.2, resolutionScale: preview ? 0.5 : 0.75});
@@ -43,7 +43,7 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     cam.position.copy(s.pos);
     cam.up.set(0, 1, 0);
     cam.lookAt(s.target);
-    cam.fov = s.fov;
+    cam.fov = fovFor(size.width / size.height);
     cam.near = s.dist * 0.02;
     cam.far = s.dist * 40;
     // keep subjects below the caption band (top third); centred again for the end card
@@ -59,7 +59,7 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     }
     {
       // softer ambient occlusion on the dark backdrop so thin processes do not turn charcoal
-      fx.ao.configuration.intensity = 1.0;
+      fx.ao.configuration.intensity = 1.4;
     }
     fx.dof.cocMaterial.worldFocusDistance = s.dist;
     fx.dof.cocMaterial.worldFocusRange = s.dist * 0.75;

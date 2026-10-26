@@ -15,10 +15,6 @@ const KEYS: [number, number][] = [
   [17, 8.7],
   [24, 11.0],
   [31, 13],
-  [42, 19],
-  [57, 25],
-  [62, 27],
-  [90, 55],
 ];
 
 // Fritsch-Carlson monotone cubic tangents
@@ -33,23 +29,35 @@ const tangents = (() => {
   return m;
 })();
 
-export function storySeconds(videoSeconds: number): number {
-  const s = Math.max(0, Math.min(DURATION_S, videoSeconds));
+/**
+ * Film structure (video seconds): 0..INTRO_END brain tissue intro and the dive into a neuron,
+ * INTRO_END..STORY_STOP the chromatin story (story seconds 0..13, the original 31 s cut, played a little faster),
+ * then the kit stage (scene/view.ts, scene/GapStage.tsx) on video time.
+ */
+export const INTRO_END = 17.6;
+export const STORY_STOP_S = 40.2;
+const STORY_LEN = 31; // original video length of the chromatin section, the KEYS domain used here
+
+function remap(u: number): number {
+  const s = Math.max(0, Math.min(STORY_LEN, u));
   let i = 0;
   while (i < KEYS.length - 2 && s > KEYS[i + 1][0]) i++;
   const [x0, y0] = KEYS[i];
   const [x1, y1] = KEYS[i + 1];
   const h = x1 - x0;
-  const u = (s - x0) / h;
-  const u2 = u * u;
-  const u3 = u2 * u;
-  return (2 * u3 - 3 * u2 + 1) * y0 + (u3 - 2 * u2 + u) * h * tangents[i] + (-2 * u3 + 3 * u2) * y1 + (u3 - u2) * h * tangents[i + 1];
+  const v = (s - x0) / h;
+  const v2 = v * v;
+  const v3 = v2 * v;
+  return (2 * v3 - 3 * v2 + 1) * y0 + (v3 - 2 * v2 + v) * h * tangents[i] + (-2 * v3 + 3 * v2) * y1 + (v3 - v2) * h * tangents[i + 1];
 }
 
-/** Story frame (0..960, fractional) for a video frame. */
-// the story clock stops when the film dives into the gap stage (see scene/view.ts GAP_T0)
-export const STORY_STOP_S = 41.2;
-export const storyFrame = (videoFrame: number) => storySeconds(Math.min(videoFrame / FPS, STORY_STOP_S)) * 30;
+export function storySeconds(videoSeconds: number): number {
+  if (videoSeconds <= INTRO_END) return 0;
+  return remap(((videoSeconds - INTRO_END) * STORY_LEN) / (STORY_STOP_S - INTRO_END));
+}
+
+/** Story frame (fractional) for a video frame. */
+export const storyFrame = (videoFrame: number) => storySeconds(videoFrame / FPS) * 30;
 export const useStoryFrame = () => storyFrame(useCurrentFrame());
 
 /** Inverse: video seconds at which a story frame happens (for audio cue placement). */

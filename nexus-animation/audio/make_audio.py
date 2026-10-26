@@ -94,20 +94,24 @@ time = 0.0
 i = 0
 while time < 86.0:
     # sections: intro, histones, marks, pull-back lift, the gap (muted once blended), bright resolve
-    if time < 2.5:
+    if time < 2.0:
         dens, gain, br = 2, 0.0, 0.6
     elif time < 10:
-        dens, gain, br = 2, 0.10, 0.7
-    elif time < 31:
-        dens, gain, br = 1, 0.12, 0.9
-    elif time < 42:
-        dens, gain, br = 1, 0.15, 1.0
-    elif time < 45:
-        dens, gain, br = 2, 0.11, 0.8  # dive into the nucleus, methylation
-    elif time < 65:
-        dens, gain, br = 2, 0.07, 0.4  # the gaps: muted, darker
+        dens, gain, br = 2, 0.11, 0.85  # brain tissue
+    elif time < 14.5:
+        dens, gain, br = 2, 0.07, 0.4   # signals diluted
+    elif time < 17.6:
+        dens, gain, br = 2, 0.10, 0.8   # dive into the nucleus
+    elif time < 40:
+        dens, gain, br = 1, 0.13, 0.95  # histones and marks
+    elif time < 50:
+        dens, gain, br = 1, 0.15, 1.1   # HisTLAND
+    elif time < 56:
+        dens, gain, br = 2, 0.11, 0.85  # methylation
+    elif time < 66:
+        dens, gain, br = 1, 0.15, 1.1   # MeTLAND
     else:
-        dens, gain, br = 1, 0.15, 1.15  # the kits
+        dens, gain, br = 1, 0.16, 1.15  # kits, two layers
     if i % dens == 0 and gain > 0:
         ch = chord_at(time)
         m = ch[pattern[i % 8] % len(ch)] + 12
@@ -122,7 +126,7 @@ while b_time < 85.0:
     n = int(BAR * SR)
     tt = np.arange(n) / SR
     s = np.sin(2 * np.pi * midi(root) * tt) * np.exp(-tt * 1.2) * np.minimum(1, tt * 60)
-    g = 0.22 if not (45 <= b_time < 65) else 0.11
+    g = 0.22 if not (10.2 <= b_time < 14.5) else 0.11
     add(s, b_time, g, 0)
     b_time += BAR
 
@@ -140,7 +144,7 @@ def shaker():
 bt = 10.0
 j = 0
 while bt < 84.5:
-    if not (45 <= bt < 65):
+    if not (10.2 <= bt < 15.5):
         if j % 2 == 0:
             add(kick(), bt, 0.30, 0)
         add(shaker(), bt + BEAT / 2, 0.035, 0.4 * (-1) ** j)
@@ -187,47 +191,41 @@ def chime(m, dur=2.5):
     return (np.sin(2 * np.pi * f * tt) + 0.4 * np.sin(2 * np.pi * 2.76 * f * tt) * np.exp(-tt * 3)) * np.exp(-tt * 1.6)
 
 # cue times (video seconds) follow the story events through the 70 s time remap
-add(chime(81, 2.5), 0.15, 0.10, 0.2)                      # opening shimmer
+add(chime(81, 2.5), 0.15, 0.10, 0.2)                       # opening shimmer
 add(riser(1.2, 200, 2500), 1.0, 0.03, 0)
-add(pop(988), 13.72, 0.20, -0.3)                           # H3K27ac mark 1
-add(pop(1175), 16.91, 0.18, 0.3)                           # H3K27ac mark 2
-add(whoosh(2.4), 17.2, 0.06, 0)                            # nucleosomes slide apart
-add(click(), 23.35, 0.25, 0)                               # polymerase clamps
-add(thud(), 29.0, 0.30, 0.3)                              # polymerase 2 bumps the coil
-add(riser(1.8, 250, 6000), 29.4, 0.045, 0)                 # into the pull-back
-add(whoosh(2.8), 31.2, 0.10, -0.2)
-add(whoosh(2.4), 34.6, 0.07, 0.2)
-add(whoosh(2.4), 38.0, 0.06, -0.1)
-add(riser(1.8, 250, 6000), 40.4, 0.04, 0)                  # dive into the neuron nucleus
-add(whoosh(2.6), 41.4, 0.09, 0)
-for q in range(6):                                          # methyl groups appear on the DNA
-    add(pop(1568 + 90 * (q % 3)) * 0.6, 42.5 + q * 0.33, 0.08, -0.5 + q * 0.2)
-add(pop(988), 45.0, 0.16, -0.2)                             # blue and coral marks
-add(pop(784), 45.15, 0.14, 0.2)
-add(click(), 46.7, 0.22, -0.2)                              # reader docks on the blue mark only
-add(chime(76, 2.4), 48.6, 0.06, -0.3)                       # sample 1
-add(chime(72, 2.4), 49.2, 0.06, 0.3)                        # sample 2
-add(thud(), 53.4, 0.22, 0)                                  # harsh treatment
-for q in range(5):                                          # fragments break off
-    add(click() * 0.7, 53.9 + q * 0.32, 0.12, -0.4 + q * 0.2)
-add(riser(3.0, 200, 3000), 54.8, 0.03, 0)                   # reads pile up
-for q in range(12):                                         # requests land on the pile
-    add(click() * 0.5, 60.3 + q * 0.38, 0.06, 0.4 * (-1) ** q)
-add(riser(1.6, 300, 6000), 63.8, 0.05, 0)                   # protocol becomes a kit
-add(chime(84, 3.0), 65.6, 0.08, 0)
+for q, m in enumerate([72, 76, 79, 84]):                   # the four cell types are named
+    add(chime(m, 2.4), 1.6 + q * 0.32, 0.06, -0.45 + q * 0.3)
+add(whoosh(3.0), 10.2, 0.08, 0)                            # the tissue blends together
+add(riser(2.4, 250, 6500), 14.8, 0.05, 0)                  # dive into the nucleus
+add(whoosh(2.6), 16.2, 0.10, 0)
+add(chime(88, 3.0), 17.8, 0.07, 0)                         # arrival at the chromatin
+add(pop(988), 26.6, 0.18, -0.3)                            # marks appear on the tails
+add(pop(1175), 28.4, 0.16, 0.3)
+add(pop(988), 30.4, 0.20, -0.2)                            # H3K27ac is written
+add(whoosh(2.2), 31.4, 0.06, 0)                            # nucleosomes slide apart
+add(click(), 33.2, 0.22, 0)                                # polymerase clamps on
+add(thud(), 37.4, 0.26, 0.3)                               # polymerase meets the closed coil
+add(riser(1.4, 300, 5000), 40.2, 0.04, 0)                  # into HisTLAND
+add(click(), 43.2, 0.22, -0.25)                            # two readers dock together
+add(click(), 43.4, 0.22, 0.25)
+add(chime(79, 2.6), 44.4, 0.07, 0)                         # one tube, two tracks
+for q in range(8):                                          # methyl groups appear
+    add(pop(1568 + 90 * (q % 3)) * 0.6, 51.2 + q * 0.34, 0.07, -0.5 + q * 0.14)
+add(chime(84, 2.8), 57.2, 0.07, 0)                          # MeTLAND
+for q in range(4):                                          # a short stack of reads
+    add(pop(1318) * 0.5, 58.8 + q * 0.3, 0.06, -0.3 + q * 0.2)
+add(riser(1.6, 300, 6000), 67.0, 0.05, 0)                   # the protocol becomes a kit
+add(chime(84, 3.0), 68.6, 0.08, 0)
 for q in range(8):                                          # kits arrive in every lab
-    add(chime([72, 76, 79, 84][q % 4] + 12 * (q // 4), 2.2), 67.5 + q * 0.28, 0.05, -0.5 + q * 0.14)
-add(click(), 76.6, 0.2, -0.2)                               # two readers dock together
-add(click(), 76.75, 0.2, 0.2)
-add(chime(79, 2.4), 77.4, 0.06, 0)                          # two tracks from one tube
-for q in range(4):                                          # short read stack
-    add(pop(1318) * 0.5, 81.5 + q * 0.3, 0.06, -0.3 + q * 0.2)
+    add(chime([72, 76, 79, 84][q % 4] + 12 * (q // 4), 2.2), 70.4 + q * 0.32, 0.05, -0.5 + q * 0.14)
+add(chime(88, 3.2), 79.0, 0.08, 0)                          # the two layers together
+add(chime(91, 3.2), 79.5, 0.06, 0.2)
 
 # ---------------------------------------------------------------- final chord + tail
 fin_n = int(6.0 * SR)
 tt = np.arange(fin_n) / SR
 fin = sum(np.sin(2 * np.pi * midi(m) * tt) for m in [53, 60, 65, 69, 72, 76]) / 6
-add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 85.2, 0.22, 0)
+add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 85.2, 0.24, 0)
 
 music = np.stack([L, R], 1)
 # gentle master: fade in/out, soft clip

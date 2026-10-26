@@ -1,12 +1,12 @@
 import React from 'react';
 import * as THREE from 'three';
 import {AbsoluteFill, Img, interpolate, useCurrentFrame, useVideoConfig, Easing, staticFile} from 'remotion';
-import {LOGO_FILE, LOGO_LIGHT} from './logo';
+import {LOGO_FILE} from './logo';
 import {loadFont} from '@remotion/fonts';
 import {C} from './lib/brand';
 import {FPS, storyFrame} from './lib/timeline';
 import {cameraAt, NUCLEUS_CENTER, TISSUE_K} from './scene/camera';
-import {offsetAt, viewAt} from './scene/view';
+import {fovFor, GAP_T0, offsetAt, viewAt} from './scene/view';
 import {gapAnchors} from './scene/GapStage';
 import {worldAt} from './scene/state';
 import {tailPoints} from './scene/tails';
@@ -19,26 +19,25 @@ loadFont({family: fontFamily, url: staticFile('RedHatDisplay-latin.woff2'), weig
 
 /** On-screen captions (video seconds). `key` is the single highlighted word. */
 export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string}[] = [
-  {from: 0.3, to: 4.6, lines: ['Every cell carries', 'the same DNA.'], key: 'same'},
-  {from: 4.9, to: 9.9, lines: ['Your DNA is wrapped', 'around histones.'], key: 'histones.'},
-  {from: 10.3, to: 16.6, lines: ['Marks on histones decide', 'which genes are read.'], key: 'Marks'},
-  {from: 17.0, to: 25.2, lines: ['H3K27ac opens', 'the DNA.'], key: 'H3K27ac'},
-  {from: 25.6, to: 31.0, lines: ['H3K27me3 locks', 'it shut.'], key: 'H3K27me3'},
-  {from: 31.6, to: 41.0, lines: ['Every cell type reads', 'different genes.'], key: 'different'},
-  {from: 41.5, to: 44.9, lines: ['DNA methylation adds', 'a second layer.'], key: 'methylation'},
-  {from: 45.2, to: 51.0, lines: ['Most methods read', 'one mark at a time.'], key: 'one'},
-  {from: 51.3, to: 58.0, lines: ['Methylation maps mean', 'harsh chemistry and', 'huge sequencing runs.'], key: 'harsh'},
-  {from: 58.3, to: 65.0, lines: ['The best methods stayed', 'in the labs that built them.'], key: 'labs'},
-  {from: 65.3, to: 70.0, lines: ['NEXUS was founded', 'to close these gaps.'], key: 'gaps.'},
-  {from: 70.2, to: 75.0, lines: ['Published methods.', 'Ready-to-use kits.'], key: 'Ready-to-use'},
-  {from: 75.3, to: 80.0, lines: ['HisTLAND: two histone marks', 'from one sample,', 'in bulk or single cells.'], key: 'HisTLAND:'},
-  {from: 80.2, to: 85.0, lines: ['MeTLAND: genome-wide methylation,', 'no bisulfite, no antibodies.'], key: 'MeTLAND:'},
+  {from: 0.3, to: 6.6, lines: ['In the brain, every cell', 'carries the same DNA.'], key: 'same'},
+  {from: 7.0, to: 9.8, lines: ['Each cell type reads', 'different genes.'], key: 'different'},
+  {from: 10.1, to: 13.9, lines: ['Grind the tissue together,', 'and signals get diluted.'], key: 'diluted.'},
+  {from: 17.6, to: 24.4, lines: ['Your DNA is wrapped', 'around histones.'], key: 'histones.'},
+  {from: 24.8, to: 29.6, lines: ['Marks on histones decide', 'which genes are read.'], key: 'Marks'},
+  {from: 29.9, to: 35.1, lines: ['H3K27ac opens', 'the DNA.'], key: 'H3K27ac'},
+  {from: 35.4, to: 40.2, lines: ['H3K27me3 locks', 'it shut.'], key: 'H3K27me3'},
+  {from: 40.7, to: 49.6, lines: ['HisTLAND®: two histone marks', 'from one sample,', 'in bulk or single cells.'], key: 'HisTLAND®:'},
+  {from: 50.3, to: 55.6, lines: ['DNA methylation adds', 'a second layer.'], key: 'methylation'},
+  {from: 56.3, to: 65.6, lines: ['MeTLAND®: genome-wide methylation,', 'no bisulfite, no antibodies.'], key: 'MeTLAND®:'},
+  {from: 66.3, to: 71.9, lines: ['Published methods,', 'made into ready-to-use kits.'], key: 'ready-to-use'},
+  {from: 72.2, to: 77.8, lines: ['Ready to run', 'in your own lab.'], key: 'own'},
+  {from: 78.3, to: 84.8, lines: ['Two layers of the epigenome.', 'HisTLAND® and MeTLAND®.'], key: 'Two'},
 ];
 
 const fadeWin = (t: number, a: number, b: number, d = 0.35) =>
   interpolate(t, [a, a + d, b - d, b], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)});
 
-const Caption: React.FC<{c: (typeof CAPTIONS)[number]; t: number; size: number}> = ({c, t, size: maxSize}) => {
+const Caption: React.FC<{c: (typeof CAPTIONS)[number]; t: number; size: number; top: number}> = ({c, t, size: maxSize, top}) => {
   const o = fadeWin(t, c.from, c.to);
   if (o <= 0) return null;
   // long lines get a slightly smaller size so the band never touches the frame margins
@@ -46,20 +45,20 @@ const Caption: React.FC<{c: (typeof CAPTIONS)[number]; t: number; size: number}>
   const size = Math.min(maxSize, Math.floor(820 / (longest * 0.53)));
   let wi = 0;
   return (
-    <div style={{position: 'absolute', left: 80, right: 80, top: 116, display: 'flex', justifyContent: 'center', opacity: Math.min(1, o * 1.4)}}>
+    <div style={{position: 'absolute', left: 80, right: 80, top: top, display: 'flex', justifyContent: 'center', opacity: Math.min(1, o * 1.4)}}>
       <div
         style={{
-          background: 'rgba(46,52,57,0.85)',
+          background: C.panel,
           borderRadius: 30,
           padding: '22px 40px 26px',
           fontFamily,
           fontWeight: 700,
           fontSize: size,
           lineHeight: 1.18,
-          color: C.offwhite,
+          color: C.charcoal,
           textAlign: 'center',
           letterSpacing: -0.5,
-          boxShadow: '0 10px 40px rgba(0,0,0,0.25)',
+          boxShadow: '0 10px 40px rgba(63,68,74,0.10)',
           transform: `scale(${0.94 + 0.06 * o})`,
         }}
       >
@@ -71,7 +70,7 @@ const Caption: React.FC<{c: (typeof CAPTIONS)[number]; t: number; size: number}>
               const p = interpolate(t, [c.from + k * 0.07, c.from + k * 0.07 + 0.3], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.out(Easing.back(1.6))});
               const isKey = w === c.key;
               return (
-                <span key={j} style={{display: 'inline-block', marginLeft: j ? '0.26em' : 0, opacity: p, transform: `translateY(${(1 - p) * 16}px)`, color: isKey ? C.keyword : C.offwhite, fontWeight: isKey ? 800 : 700}}>
+                <span key={j} style={{display: 'inline-block', marginLeft: j ? '0.26em' : 0, opacity: p, transform: `translateY(${(1 - p) * 16}px)`, color: isKey ? C.blue : C.charcoal, fontWeight: isKey ? 800 : 700}}>
                   {w}
                 </span>
               );
@@ -86,7 +85,7 @@ const Caption: React.FC<{c: (typeof CAPTIONS)[number]; t: number; size: number}>
 /* ---------------------------------------------------------------- 3D -> screen projection */
 function makeProjector(vf: number, w: number, h: number) {
   const s = viewAt(vf);
-  const cam = new THREE.PerspectiveCamera(s.fov, w / h, s.dist * 0.02, s.dist * 40);
+  const cam = new THREE.PerspectiveCamera(fovFor(w / h), w / h, s.dist * 0.02, s.dist * 40);
   cam.position.copy(s.pos);
   cam.up.set(0, 1, 0);
   cam.lookAt(s.target);
@@ -100,11 +99,11 @@ function makeProjector(vf: number, w: number, h: number) {
   };
 }
 
-const Tag: React.FC<{x: number; y: number; color: string; text?: string; title: string; sub: string; o: number; side?: 1 | -1; dy?: number}> = ({x, y, color, text = '#FBF9F6', title, sub, o, side = 1, dy = -110}) => {
+const Tag: React.FC<{x: number; y: number; color: string; text?: string; title: string; sub: string; o: number; side?: 1 | -1; dy?: number; h?: number}> = ({x, y, color, text = '#FBF9F6', title, sub, o, side = 1, dy = -110, h = 1350}) => {
   if (o <= 0.01) return null;
   const dx = 70 * side;
   const lx = Math.min(1080 - 340, Math.max(80 + 290 * (side < 0 ? 1 : 0), x + dx));
-  const ly = Math.min(1350 - 200, Math.max(430, y + dy));
+  const ly = Math.min(h - 200, Math.max(430, y + dy));
   return (
     <>
       <svg style={{position: 'absolute', left: 0, top: 0, overflow: 'visible', opacity: o}} width={1} height={1}>
@@ -126,7 +125,7 @@ const Tag: React.FC<{x: number; y: number; color: string; text?: string; title: 
           padding: '8px 18px 10px',
           fontFamily,
           whiteSpace: 'nowrap',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+          boxShadow: '0 8px 24px rgba(63,68,74,0.18)',
           ...(side < 0 ? {left: lx} : {}),
         }}
       >
@@ -152,11 +151,12 @@ const MarkTags: React.FC<{sf: number; vf: number; w: number; h: number}> = ({sf,
     const p = proj(new THREE.Vector3(pts[3 * k], pts[3 * k + 1], pts[3 * k + 2]));
     if (!p.behind) {
       const side = p.x > w * 0.55 ? -1 : 1;
-      out.push(<Tag key="ac" x={p.x} y={p.y} color={C.markBlue} text={C.bg} title="H3K27ac" sub="active mark · DNA opens" o={oAc} side={side as 1 | -1} dy={-150} />);
+      out.push(<Tag key="ac" x={p.x} y={p.y} color={C.coral} title="H3K27ac" sub="active mark · DNA opens" o={oAc} side={side as 1 | -1} dy={-150} h={h} />);
     }
   }
   // H3K27me3 on the compact coil: tag the most visible coral mark
-  const oMe = ramp(sf, 356, 366, (x) => x) * (1 - ramp(sf, 404, 414, (x) => x));
+  // the story clock holds at its last frame after the chromatin section, so also fade by video time
+  const oMe = ramp(sf, 356, 366, (x) => x) * (1 - ramp(sf, 404, 414, (x) => x)) * (1 - ramp(vf / FPS, 39.5, 40.1, (x) => x));
   if (oMe > 0) {
     let best: {x: number; y: number; d: number} | null = null;
     const cam = cameraAt(sf);
@@ -174,23 +174,23 @@ const MarkTags: React.FC<{sf: number; vf: number; w: number; h: number}> = ({sf,
       const score = d + Math.abs(p.y - h * 0.48) * 0.05;
       if (!best || score < best.d) best = {x: p.x, y: p.y, d: score};
     }
-    if (best) out.push(<Tag key="me3" x={best.x} y={best.y} color={C.coral} text={C.bg} title="H3K27me3" sub="repressive mark · DNA locked" o={oMe} side={best.x > w * 0.5 ? -1 : 1} dy={-120} />);
+    if (best) out.push(<Tag key="me3" x={best.x} y={best.y} color={C.coral} title="H3K27me3" sub="repressive mark · DNA locked" o={oMe} side={best.x > w * 0.5 ? -1 : 1} dy={-120} h={h} />);
   }
   return <>{out}</>;
 };
 
 const CELL_NAME: Record<string, string> = {neuron: 'Neuron', astro: 'Astrocyte', oligo: 'Oligodendrocyte', micro: 'Microglia'};
-const CELL_BG: Record<string, string> = {neuron: C.magenta, astro: C.tealLight, oligo: C.sand, micro: C.coral};
+const CELL_BG: Record<string, string> = {neuron: C.magenta, astro: C.teal, oligo: C.sand, micro: C.coral};
 /** Name one example of each cell type while the narration lists them. */
-const CellLabels: React.FC<{sf: number; vf: number; w: number; h: number}> = ({sf, vf, w, h}) => {
+const CellLabels: React.FC<{vf: number; w: number; h: number}> = ({vf, w, h}) => {
   const proj = makeProjector(vf, w, h);
   const vt = vf / FPS;
-  const out = 1 - ramp(vt, 40.2, 40.9, (x) => x);
+  const out = 1 - ramp(vt, 9.2, 9.8, (x) => x);
   const square = h < 1200;
   // place labels, then push apart any that would overlap
   const fs = square ? 26 : 30;
   const items = TYPES.map((t, i) => {
-    const o = ramp(sf, 500 + i * 8, 516 + i * 8, (x) => x) * out;
+    const o = ramp(vt, 1.4 + i * 0.3, 1.9 + i * 0.3, (x) => x) * out;
     const c = repCell(t);
     const p = proj(c.pos.clone().multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
     const half = (CELL_NAME[t].length * 0.56 * fs + 32) / 2;
@@ -212,7 +212,7 @@ const CellLabels: React.FC<{sf: number; vf: number; w: number; h: number}> = ({s
             <line x1={x} y1={y - 26} x2={clampToFrame(p.x, 0, w)} y2={clampToFrame(p.y, 0, h)} stroke={CELL_BG[t]} strokeWidth={3} strokeLinecap="round" />
           </svg>
           <div style={{position: 'absolute', left: x, top: y, transform: `translate(-50%, -100%) translateY(${-26 - (1 - o) * 10}px)`, opacity: o}}>
-            <div style={{background: CELL_BG[t], color: C.bg, border: 'none', borderRadius: 14, padding: '6px 14px 8px', fontFamily, fontWeight: 800, fontSize: fs, whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(0,0,0,0.3)'}}>
+            <div style={{background: CELL_BG[t], color: t === 'oligo' ? C.charcoal : '#FBF9F6', border: t === 'oligo' ? `2px solid ${C.charcoal}` : 'none', borderRadius: 14, padding: '6px 14px 8px', fontFamily, fontWeight: 800, fontSize: fs, whiteSpace: 'nowrap', boxShadow: '0 6px 18px rgba(63,68,74,0.16)'}}>
               {CELL_NAME[t]}
             </div>
           </div>
@@ -222,36 +222,26 @@ const CellLabels: React.FC<{sf: number; vf: number; w: number; h: number}> = ({s
   );
 };
 
-/** Tube labels in the "one mark at a time" beat and the two kit tags. */
+/** Kit tags: HisTLAND® and MeTLAND® on their scenes, then both together on the two-layers scene. */
 const GapLabels: React.FC<{vf: number; w: number; h: number}> = ({vf, w, h}) => {
   const proj = makeProjector(vf, w, h);
   const t = vf / FPS;
   const a = gapAnchors();
   const square = h < 1200;
+  const dy = square ? 150 : 210;
   const nodes: React.ReactNode[] = [];
-  const oT = ramp(t, 48.8, 49.4, (x) => x) * (1 - ramp(t, 50.8, 51.3, (x) => x));
-  if (oT > 0)
-    (
-      [
-        [a.tube1, 'Sample 1', 'H3K27ac', C.markBlue],
-        [a.tube2, 'Sample 2', 'H3K27me3', C.coral],
-      ] as const
-    ).forEach(([p3, name, mark, col]) => {
-      const p = proj(p3);
-      if (p.behind) return;
-      nodes.push(
-        <div key={name} style={{position: 'absolute', left: p.x, top: p.y, transform: 'translate(-50%, 0)', opacity: oT, fontFamily, textAlign: 'center', whiteSpace: 'nowrap'}}>
-          <div style={{fontWeight: 700, fontSize: square ? 26 : 30, color: C.offwhite}}>{name}</div>
-          <div style={{fontWeight: 800, fontSize: square ? 26 : 30, color: col}}>{mark}</div>
-        </div>,
-      );
-    });
-  const oH = ramp(t, 76.2, 76.8, (x) => x) * (1 - ramp(t, 79.9, 80.4, (x) => x));
-  const oM = ramp(t, 81.0, 81.6, (x) => x) * (1 - ramp(t, 84.6, 85.1, (x) => x));
-  const ph = proj(a.histMark);
-  const pm = proj(a.metMethyl);
-  if (oH > 0 && !ph.behind) nodes.push(<Tag key="h" x={ph.x} y={ph.y} color={C.blue} title="HisTLAND" sub="histone marks · bulk + single cell" o={oH} side={ph.x > w * 0.5 ? -1 : 1} dy={square ? 150 : 210} />);
-  if (oM > 0 && !pm.behind) nodes.push(<Tag key="m" x={pm.x} y={pm.y} color={C.teal} title="MeTLAND" sub="DNA methylation · bulk" o={oM} side={pm.x > w * 0.5 ? -1 : 1} dy={square ? 150 : 210} />);
+  const tag = (key: string, p3: THREE.Vector3, o: number, kit: 'h' | 'm', up = false) => {
+    if (o <= 0) return;
+    const p = proj(p3);
+    if (p.behind) return;
+    const props = kit === 'h' ? {color: C.blue, title: 'HisTLAND®', sub: 'histone marks · bulk + single cell'} : {color: C.teal, title: 'MeTLAND®', sub: 'DNA methylation · bulk'};
+    nodes.push(<Tag key={key} x={p.x} y={p.y} {...props} o={o} side={p.x > w * 0.5 ? -1 : 1} dy={up ? -dy * 0.7 : dy} h={h} />);
+  };
+  tag('h', a.histMark, ramp(t, 42.8, 43.4, (x) => x) * (1 - ramp(t, 49.4, 49.9, (x) => x)), 'h');
+  tag('m', a.metMethyl, ramp(t, 57.2, 57.8, (x) => x) * (1 - ramp(t, 65.2, 65.7, (x) => x)), 'm');
+  const oL = ramp(t, 79.4, 80.0, (x) => x) * (1 - ramp(t, 84.4, 84.9, (x) => x));
+  tag('lh', a.layersMark, oL, 'h', true);
+  tag('lm', a.layersMethyl, oL, 'm');
   return <>{nodes}</>;
 };
 
@@ -266,7 +256,8 @@ export const Overlay: React.FC = () => {
   const sf = storyFrame(f);
   const {width, height} = useVideoConfig();
   const square = height < 1200;
-  const endStart = 85.1;
+  const tall = height > 1500;
+  const endStart = 85.2;
   return (
     <AbsoluteFill style={{pointerEvents: 'none'}}>
       {LOGO_FILE && t > 1.5 && t < 85.0 ? (
@@ -274,30 +265,35 @@ export const Overlay: React.FC = () => {
           style={{
             position: 'absolute',
             left: 80,
-            bottom: 80,
+            bottom: tall ? 300 : 80,
             padding: '10px 16px',
             borderRadius: 16,
-            background: 'rgba(251,249,246,0.92)',
-            boxShadow: '0 6px 20px rgba(0,0,0,0.25)',
+            background: 'rgba(244,241,236,0.88)',
+            boxShadow: '0 6px 20px rgba(63,68,74,0.08)',
             opacity: interpolate(t, [1.5, 2.5, 84.3, 85.0], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}),
           }}
         >
           <Img src={staticFile(LOGO_FILE)} style={{height: square ? 40 : 46, width: 'auto', display: 'block'}} />
         </div>
       ) : null}
-      {sf < 420 ? <MarkTags sf={sf} vf={f} w={width} h={height} /> : null}
-      {sf > 495 && t < 41 ? <CellLabels sf={sf} vf={f} w={width} h={height} /> : null}
-      {t > 48 && t < 85.2 ? <GapLabels vf={f} w={width} h={height} /> : null}
+      {sf > 200 && t < GAP_T0 ? <MarkTags sf={sf} vf={f} w={width} h={height} /> : null}
+      {t > 1 && t < 10 ? <CellLabels vf={f} w={width} h={height} /> : null}
+      {t > 42 && t < 85.2 ? <GapLabels vf={f} w={width} h={height} /> : null}
       {CAPTIONS.map((c, i) => (
-        <Caption key={i} c={c} t={t} size={square ? 54 : 60} />
+        <Caption key={i} c={c} t={t} size={square ? 54 : 60} top={tall ? 190 : 116} />
       ))}
       {t >= endStart ? (
-        // end card: the scene fades to the background and only the logo remains
-        <AbsoluteFill style={{background: C.bg, opacity: interpolate(t, [endStart, endStart + 0.8], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.cubic)}), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <EndLine t={t} at={endStart + 0.5} style={{}}>
-            <Img src={staticFile(LOGO_LIGHT)} style={{width: square ? 620 : 680, height: 'auto', display: 'block'}} />
+        <div style={{position: 'absolute', left: 80, right: 80, bottom: tall ? 320 : 80, fontFamily, color: C.charcoal}}>
+          <EndLine t={t} at={85.3} style={{marginBottom: square ? 4 : 8}}>
+            <Img src={staticFile(LOGO_FILE ?? 'logo.png')} style={{height: square ? 112 : 136, width: 'auto', display: 'block'}} />
           </EndLine>
-        </AbsoluteFill>
+          <EndLine t={t} at={86.0} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: square ? 12 : 20, lineHeight: 1.25}}>
+            Founded in Stockholm.
+          </EndLine>
+          <EndLine t={t} at={86.6} style={{fontWeight: 800, fontSize: square ? 48 : 58, marginTop: square ? 18 : 30, letterSpacing: -0.5, lineHeight: 1.12, maxWidth: 920}}>
+            What is the question you are solving in epigenetics?
+          </EndLine>
+        </div>
       ) : null}
     </AbsoluteFill>
   );

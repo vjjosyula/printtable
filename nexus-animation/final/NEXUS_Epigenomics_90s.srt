@@ -1,83 +1,68 @@
 1
-00:00:00,400 --> 00:00:03,146
-Every cell in your body
-carries the same DNA.
+00:00:00,400 --> 00:00:06,654
+In the brain, neurons, astrocytes,
+oligodendrocytes and microglia all carry the same
+DNA.
 
 2
-00:00:03,600 --> 00:00:08,577
-About two metres of it, wrapped around proteins
-called histones, like thread on spools.
+00:00:07,000 --> 00:00:09,310
+Yet each cell type reads different genes.
 
 3
-00:00:10,200 --> 00:00:14,250
-Small chemical marks on histone tails
-decide which genes are read.
+00:00:10,200 --> 00:00:13,413
+Grind the tissue together, and
+those signals are diluted.
 
 4
-00:00:14,300 --> 00:00:19,734
-Here, an enzyme adds an
-activating mark, H3K27ac.
+00:00:17,800 --> 00:00:22,340
+Inside every nucleus, DNA is wrapped
+around proteins called histones.
 
 5
-00:00:19,800 --> 00:00:23,735
-The nucleosomes slide apart, so
-polymerase can read the gene.
+00:00:24,900 --> 00:00:28,407
+Small marks on histone tails
+decide which genes are read.
 
 6
-00:00:24,200 --> 00:00:29,227
-Elsewhere, H3K27me3 packs the DNA tightly.
+00:00:30,000 --> 00:00:35,292
+H3K27ac opens the DNA, so
+the gene can be read.
 
 7
-00:00:29,300 --> 00:00:32,450
-The polymerase can't get in.
-The gene stays silent.
+00:00:35,500 --> 00:00:40,929
+H3K27me3 packs it tightly, and
+the gene stays silent.
 
 8
-00:00:32,500 --> 00:00:35,940
-Zoom out, and every cell type has
-its own pattern of marks.
+00:00:41,000 --> 00:00:45,740
+HisTLAND® reads two histone marks from one
+sample, in bulk or in single cells.
 
 9
-00:00:36,000 --> 00:00:41,317
-Neurons, astrocytes, oligodendrocytes and
-microglia each read different genes.
-
-10
-00:00:41,600 --> 00:00:45,878
+00:00:50,400 --> 00:00:54,818
 DNA methylation adds a second layer,
 written on the DNA itself.
 
+10
+00:00:56,500 --> 00:01:01,004
+MeTLAND® maps DNA methylation
+without bisulfite or antibodies.
+
 11
-00:00:46,000 --> 00:00:51,950
-But most methods read one histone mark at a time, so on
-and off genes are measured in separate samples.
+00:01:06,400 --> 00:01:12,028
+NEXUS Epigenomics, founded in Stockholm, turns
+published methods into ready-to-use kits.
 
 12
-00:00:52,000 --> 00:00:57,699
-Methylation maps rely on bisulfite, which
-damages DNA, and on very deep sequencing.
+00:01:12,600 --> 00:01:14,146
+Ready to run in your own lab.
 
 13
-00:00:58,300 --> 00:01:00,928
-And the best methods stayed in
-the labs that built them.
+00:01:18,400 --> 00:01:21,566
+Two layers of the epigenome.
+HisTLAND® and MeTLAND®.
 
 14
-00:01:05,000 --> 00:01:10,600
-NEXUS Epigenomics was founded in
-Stockholm in 2024 to close these gaps,
-
-15
-00:01:10,650 --> 00:01:15,199
-turning methods published in Nature
-Biotechnology into ready-to-use kits.
-
-16
-00:01:15,900 --> 00:01:20,640
-HisTLAND reads two histone marks from one
-sample, in bulk or in single cells.
-
-17
-00:01:20,700 --> 00:01:25,204
-MeTLAND maps DNA methylation
-without bisulfite or antibodies.
+00:01:26,300 --> 00:01:29,406
+What is the question you are
+solving in epigenetics?
