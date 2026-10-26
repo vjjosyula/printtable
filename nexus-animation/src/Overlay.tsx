@@ -235,7 +235,9 @@ const GapLabels: React.FC<{vf: number; w: number; h: number}> = ({vf, w, h}) => 
     const p = proj(p3);
     if (p.behind) return;
     const props = kit === 'h' ? {color: C.blue, title: 'HisTLAND®', sub: 'histone marks · bulk + single cell'} : {color: C.teal, title: 'MeTLAND®', sub: 'DNA methylation · bulk'};
-    nodes.push(<Tag key={key} x={p.x} y={p.y} {...props} o={o} side={p.x > w * 0.5 ? -1 : 1} dy={up ? -dy * 0.7 : dy} h={h} />);
+    // keep tags inside the frame: below the anchor when there is room, otherwise above it
+    const below = p.y + dy < h - 170;
+    nodes.push(<Tag key={key} x={p.x} y={p.y} {...props} o={o} side={p.x > w * 0.5 ? -1 : 1} dy={up || !below ? -Math.abs(dy) * 0.8 : dy} h={h} />);
   };
   tag('h', a.histMark, ramp(t, 42.8, 43.4, (x) => x) * (1 - ramp(t, 49.4, 49.9, (x) => x)), 'h');
   tag('m', a.metMethyl, ramp(t, 57.2, 57.8, (x) => x) * (1 - ramp(t, 65.2, 65.7, (x) => x)), 'm');

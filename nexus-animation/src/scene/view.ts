@@ -47,8 +47,8 @@ const KEYS: [number, [number, number, number], number, number, number][] = [
   [55.4, [152, 0, 0], 62, -0.3, 0.25],
   [57.0, [299, -2, 0], 84, -0.25, 0.22],
   [65.4, [300, -1, 0], 80, -0.1, 0.18],
-  [67.2, [520, 0, 0], 240, -0.1, 0.62],
-  [77.0, [520, 2, 0], 215, 0.35, 0.55],
+  [67.2, [520, -2, 0], 150, -0.1, 0.52],
+  [77.0, [520, 0, 0], 138, 0.35, 0.46],
   [78.9, [762, -1, 0], 88, -0.2, 0.22],
   [84.6, [763, 0, 0], 82, -0.05, 0.18],
   [86.2, [763, 2, 0], 104, 0, 0.14],
@@ -82,12 +82,12 @@ function blendCam(a: CamState, b: CamState, u: number): CamState {
 export function viewAt(videoFrame: number): CamState {
   const t = videoFrame / FPS;
   if (t < DIVE_IN) return cameraAt(545 + 45 * easeInOutCubic(t / DIVE_IN)); // tissue overview, slow drift
-  if (t < INTRO_END - 1.0) {
-    // dive into the neuron: the original pull-back (story 392..590) in reverse
-    const u = (t - DIVE_IN) / (INTRO_END - 1.0 - DIVE_IN);
-    return cameraAt(590 - 198 * easeInOutCubic(u));
+  if (t < INTRO_END - 1.6) {
+    // dive into the neuron: the original pull-back (story 430..590) in reverse
+    const u = (t - DIVE_IN) / (INTRO_END - 1.6 - DIVE_IN);
+    return cameraAt(590 - 160 * easeInOutCubic(u));
   }
-  if (t < INTRO_END) return blendCam(cameraAt(392), cameraAt(0), (t - (INTRO_END - 1.0)) / 1.0);
+  if (t < INTRO_END) return blendCam(cameraAt(430), cameraAt(0), (t - (INTRO_END - 1.6)) / 1.6);
   if (t <= GAP_T0) return cameraAt(storyFrame(videoFrame));
   if (t >= GAP_T0 + GLIDE) return stageCam(t);
   return blendCam(cameraAt(storyFrame(videoFrame)), stageCam(GAP_T0 + GLIDE), (t - GAP_T0) / GLIDE);
