@@ -29,3 +29,7 @@ Do not apply yet. Apply when the user asks.
 10. Look: light throughout (keep the light warm background also in the brain-tissue section, no deep blue backdrop),
     with the better textbook neurons (star-shaped soma, tapering forking dendrites, myelinated axon with bulb terminals),
     coloured to read well on the light background.
+11. RNA polymerase (the big teal/cyan block that clamps on the DNA when H3K27ac opens it, about 17 to 31 s,
+    plus its RNA strand) changes from teal to a terracotta, similar to the coral of the H3K27me3 / methylation marks.
+    Use a distinct, softer terracotta (proposed #D08A63) so it does not read as a repressive mark (#BE5038),
+    unless the user asks for the exact same colour.
