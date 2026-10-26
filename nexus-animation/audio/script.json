@@ -48,10 +48,10 @@
   "speed": 1.05
  },
  {
-  "start": 50.4,
-  "say": "DNA methylation adds a second layer, written on the DNA itself.",
-  "show": "DNA methylation adds a second layer, written on the DNA itself.",
-  "speed": 1.05
+  "start": 46.6,
+  "say": "Epigenetic profiling has another layer, DNA methylation, written on the DNA itself.",
+  "show": "Epigenetic profiling has another layer, DNA methylation, written on the DNA itself.",
+  "speed": 1.08
  },
  {
   "start": 56.5,
@@ -61,9 +61,9 @@
  },
  {
   "start": 66.4,
-  "say": "NEXUS Epigenomics, founded in Stockholm, turns published methods into ready-to-use kits.",
-  "show": "NEXUS Epigenomics, founded in Stockholm, turns published methods into ready-to-use kits.",
-  "speed": 1.1
+  "say": "NEXUS Epigenomics, founded in Stockholm, builds kits around published methods from academic labs.",
+  "show": "NEXUS Epigenomics, founded in Stockholm, builds kits around published methods from academic labs.",
+  "speed": 1.12
  },
  {
   "start": 72.6,

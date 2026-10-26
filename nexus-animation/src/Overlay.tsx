@@ -27,10 +27,10 @@ export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string}
   {from: 29.9, to: 35.1, lines: ['H3K27ac opens', 'the DNA.'], key: 'H3K27ac'},
   {from: 35.4, to: 40.2, lines: ['H3K27me3 locks', 'it shut.'], key: 'H3K27me3'},
   {from: 40.7, to: 49.6, lines: ['HisTLAND®: two histone marks', 'from one sample,', 'in bulk or single cells.'], key: 'HisTLAND®:'},
-  {from: 50.3, to: 55.6, lines: ['DNA methylation adds', 'a second layer.'], key: 'methylation'},
+  {from: 46.4, to: 55.6, lines: ['Epigenetic profiling', 'has another layer:', 'DNA methylation.'], key: 'methylation.'},
   {from: 56.3, to: 65.6, lines: ['MeTLAND®: genome-wide methylation,', 'no bisulfite, no antibodies.'], key: 'MeTLAND®:'},
-  {from: 66.3, to: 71.9, lines: ['Published methods,', 'made into ready-to-use kits.'], key: 'ready-to-use'},
-  {from: 72.2, to: 77.8, lines: ['Ready to run', 'in your own lab.'], key: 'own'},
+  {from: 66.3, to: 71.9, lines: ['Built around published methods', 'from academic labs.'], key: 'published'},
+  {from: 72.2, to: 77.8, lines: ['Made into kits you can run', 'in your own lab.'], key: 'kits'},
   {from: 78.3, to: 84.8, lines: ['Two layers of the epigenome.', 'HisTLAND® and MeTLAND®.'], key: 'Two'},
 ];
 

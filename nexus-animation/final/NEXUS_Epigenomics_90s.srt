@@ -39,9 +39,9 @@ HisTLAND® reads two histone marks from one
 sample, in bulk or in single cells.
 
 9
-00:00:50,400 --> 00:00:54,818
-DNA methylation adds a second layer,
-written on the DNA itself.
+00:00:46,600 --> 00:00:52,329
+Epigenetic profiling has another layer, DNA
+methylation, written on the DNA itself.
 
 10
 00:00:56,500 --> 00:01:01,004
@@ -49,9 +49,9 @@ MeTLAND® maps DNA methylation
 without bisulfite or antibodies.
 
 11
-00:01:06,400 --> 00:01:12,028
-NEXUS Epigenomics, founded in Stockholm, turns
-published methods into ready-to-use kits.
+00:01:06,400 --> 00:01:12,388
+NEXUS Epigenomics, founded in Stockholm, builds kits
+around published methods from academic labs.
 
 12
 00:01:12,600 --> 00:01:14,146
