@@ -25,38 +25,38 @@
  },
  {
   "start": 17.2,
-  "say": "Two layers: marks on histones, and methylation on the DNA itself.",
-  "show": "Two layers: marks on histones, and methylation on the DNA itself.",
+  "say": "Two layers: histone modifications, and methylation of the DNA.",
+  "show": "Two layers: histone modifications, and methylation of the DNA.",
   "speed": 1.05
  },
  {
   "start": 21.8,
-  "say": "Inside the nucleus, DNA is wrapped around histones.",
-  "show": "Inside the nucleus, DNA is wrapped around histones.",
+  "say": "Layer one: the histones that DNA is wrapped around.",
+  "show": "Layer one: the histones that DNA is wrapped around.",
   "speed": 1.05
  },
  {
   "start": 25.8,
-  "say": "Small marks on their tails decide which genes are read.",
-  "show": "Small marks on their tails decide which genes are read.",
+  "say": "Chemical marks on their tails decide which genes are read.",
+  "show": "Chemical marks on their tails decide which genes are read.",
   "speed": 1.05
  },
  {
   "start": 30.0,
-  "say": "H3 K27 acetylation opens the DNA, so the gene can be read.",
-  "show": "H3K27ac opens the DNA, so the gene can be read.",
+  "say": "Acetylation opens the DNA, so the gene can be read.",
+  "show": "Acetylation opens the DNA, so the gene can be read.",
   "speed": 1.05
  },
  {
   "start": 35.5,
-  "say": "H3 K27 tri-methylation packs it tightly, and the gene stays silent.",
-  "show": "H3K27me3 packs it tightly, and the gene stays silent.",
+  "say": "Methylation of the histone packs it tightly, and the gene stays silent.",
+  "show": "Methylation of the histone packs it tightly, and the gene stays silent.",
   "speed": 1.05
  },
  {
   "start": 41.2,
-  "say": "To measure these marks, NEXUS built Histland.",
-  "show": "To measure these marks, NEXUS built HisTLAND\u00ae.",
+  "say": "To measure both marks together, NEXUS built Histland.",
+  "show": "To measure both marks together, NEXUS built HisTLAND\u00ae.",
   "speed": 1.05
  },
  {
@@ -67,14 +67,14 @@
  },
  {
   "start": 50.2,
-  "say": "The second layer is written on the DNA itself: methylation.",
-  "show": "The second layer is written on the DNA itself: methylation.",
+  "say": "Layer two sits on the DNA itself: methylation.",
+  "show": "Layer two sits on the DNA itself: methylation.",
   "speed": 1.05
  },
  {
   "start": 56.4,
-  "say": "For that layer, NEXUS built Metland.",
-  "show": "For that layer, NEXUS built MeTLAND\u00ae.",
+  "say": "To map it genome-wide, NEXUS built Metland.",
+  "show": "To map it genome-wide, NEXUS built MeTLAND\u00ae.",
   "speed": 1.05
  },
  {

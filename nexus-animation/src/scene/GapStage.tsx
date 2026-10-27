@@ -395,11 +395,9 @@ function build() {
   // HisTLAND®: one nucleosome carrying an active and a repressive mark
   const hNuc = makeNuc(310, v3(0, 0, 0), 2.7, ['ac', 'me3']);
   const hCl = buildCenterline([hNuc], 16, 16);
-  // methylation: three nucleosomes, methyl groups appear along the DNA
-  const vNucs = [makeNuc(301, v3(-27, 1, -1), 0.5), makeNuc(302, v3(0, 0, 0.5), 2.7), makeNuc(303, v3(27, -1, 0), 4.7)];
-  const vCl = buildCenterline(vNucs, 30, 30);
-  const vAnchor = vCl.dyadS.get(302)!;
-  const vLollies = lollipops(vCl, vAnchor, 46, 31, 6).filter(notIntoCore(vNucs));
+  // layer two: bare DNA (no histones), with methyl groups appearing along it
+  const vCl = lineCenterline([v3(-34, -1.0, 0), v3(-17, 1.2, 0.8), v3(0, -0.6, -0.6), v3(17, 1.0, 0.5), v3(34, -0.8, 0)]);
+  const vLollies = lollipops(vCl, 0, 16, 31, 3);
   // MeTLAND®: intact methylated DNA
   const mCl = lineCenterline([v3(-17, -0.5, 0), v3(-6, 0.8, 0.5), v3(6, -0.6, -0.4), v3(17, 0.4, 0)]);
   const mLollies = lollipops(mCl, 0, 9, 77, 2);
@@ -408,7 +406,7 @@ function build() {
   const lCl = buildCenterline(lNucs, 20, 20);
   const lAnchor = lCl.dyadS.get(321)!;
   const lLollies = lollipops(lCl, lAnchor, 30, 55, 4).filter(notIntoCore(lNucs));
-  return {hNuc, hCl, vNucs, vCl, vAnchor, vLollies, mCl, mLollies, lNucs, lCl, lAnchor, lLollies};
+  return {hNuc, hCl, vCl, vLollies, mCl, mLollies, lNucs, lCl, lAnchor, lLollies};
 }
 export const gapBuilt = () => (built ??= build());
 
@@ -465,8 +463,7 @@ export const GapStage: React.FC = () => {
       ) : null}
       {win(t, 49.0, 57.6) ? (
         <group position={[GAP.methyl, 0, 0]}>
-          <DNA cl={b.vCl} anchor={b.vAnchor} lollies={b.vLollies} show={methylShow} />
-          <Nucleosomes nucs={b.vNucs} />
+          <DNA cl={b.vCl} lollies={b.vLollies} show={methylShow} />
         </group>
       ) : null}
       {win(t, 55.4, 67.6) ? (
