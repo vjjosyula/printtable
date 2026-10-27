@@ -1,0 +1,110 @@
+[
+ {
+  "start": 2.0,
+  "say": "Every cell in your body carries the same DNA.",
+  "show": "Every cell in your body carries the same DNA.",
+  "speed": 1.05
+ },
+ {
+  "start": 5.4,
+  "say": "So why does a neuron behave nothing like the cell beside it?",
+  "show": "So why does a neuron behave nothing like the cell beside it?",
+  "speed": 1.05
+ },
+ {
+  "start": 9.2,
+  "say": "Because in any one cell, only part of that DNA is ever switched on.",
+  "show": "Because in any one cell, only part of that DNA is ever switched on.",
+  "speed": 1.05
+ },
+ {
+  "start": 13.8,
+  "say": "Which genes are switched on is set by the epigenome.",
+  "show": "Which genes are switched on is set by the epigenome.",
+  "speed": 1.05
+ },
+ {
+  "start": 17.2,
+  "say": "Two layers: histone modifications, and methylation of the DNA.",
+  "show": "Two layers: histone modifications, and methylation of the DNA.",
+  "speed": 1.05
+ },
+ {
+  "start": 21.8,
+  "say": "Layer one: the histones that DNA is wrapped around.",
+  "show": "Layer one: the histones that DNA is wrapped around.",
+  "speed": 1.05
+ },
+ {
+  "start": 25.8,
+  "say": "Chemical marks on their tails decide which genes are read.",
+  "show": "Chemical marks on their tails decide which genes are read.",
+  "speed": 1.05
+ },
+ {
+  "start": 30.0,
+  "say": "Acetylation opens the DNA, so the gene can be read.",
+  "show": "Acetylation opens the DNA, so the gene can be read.",
+  "speed": 1.05
+ },
+ {
+  "start": 35.5,
+  "say": "Methylation of the histone packs it tightly, and the gene stays silent.",
+  "show": "Methylation of the histone packs it tightly, and the gene stays silent.",
+  "speed": 1.05
+ },
+ {
+  "start": 41.2,
+  "say": "To measure both marks together, NEXUS built Histland.",
+  "show": "To measure both marks together, NEXUS built HisTLAND\u00ae.",
+  "speed": 1.05
+ },
+ {
+  "start": 44.8,
+  "say": "It reads two histone marks from one sample, in bulk or in single cells.",
+  "show": "It reads two histone marks from one sample, in bulk or in single cells.",
+  "speed": 1.05
+ },
+ {
+  "start": 50.2,
+  "say": "Layer two sits on the DNA itself: methylation.",
+  "show": "Layer two sits on the DNA itself: methylation.",
+  "speed": 1.05
+ },
+ {
+  "start": 56.4,
+  "say": "To map it genome-wide, NEXUS built Metland.",
+  "show": "To map it genome-wide, NEXUS built MeTLAND\u00ae.",
+  "speed": 1.05
+ },
+ {
+  "start": 59.8,
+  "say": "It maps DNA methylation without bisulfite or antibodies.",
+  "show": "It maps DNA methylation without bisulfite or antibodies.",
+  "speed": 1.05
+ },
+ {
+  "start": 66.4,
+  "say": "NEXUS Epigenomics, founded in Stockholm, builds kits around published methods from academic labs.",
+  "show": "NEXUS Epigenomics, founded in Stockholm, builds kits around published methods from academic labs.",
+  "speed": 1.12
+ },
+ {
+  "start": 72.6,
+  "say": "Ready to run in your own lab.",
+  "show": "Ready to run in your own lab.",
+  "speed": 1.05
+ },
+ {
+  "start": 75.8,
+  "say": "Two layers of the epigenome, measured by Histland and Metland.",
+  "show": "Two layers of the epigenome, measured by HisTLAND\u00ae and MeTLAND\u00ae.",
+  "speed": 1.05
+ },
+ {
+  "start": 82.8,
+  "say": "What is the question you are solving in epigenetics?",
+  "show": "What is the question you are solving in epigenetics?",
+  "speed": 1.05
+ }
+]
