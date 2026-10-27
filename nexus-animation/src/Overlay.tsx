@@ -35,7 +35,7 @@ export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string}
   {from: 59.7, to: 65.6, lines: ['No bisulfite,', 'no antibodies.'], key: 'No'},
   {from: 66.3, to: 71.9, lines: ['Built around published methods', 'from academic labs.'], key: 'published'},
   {from: 72.2, to: 75.1, lines: ['Made into kits you can run', 'in your own lab.'], key: 'kits'},
-  {from: 75.4, to: 81.6, lines: ['Two layers of the epigenome.', 'HisTLAND® and MeTLAND®.'], key: 'Two'},
+  {from: 75.4, to: 81.6, lines: ['Two layers,', 'measured with HisTLAND®', 'and MeTLAND®.'], key: 'measured'},
 ];
 
 const fadeWin = (t: number, a: number, b: number, d = 0.35) =>

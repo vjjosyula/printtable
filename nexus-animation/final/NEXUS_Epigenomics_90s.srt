@@ -78,9 +78,9 @@ around published methods from academic labs.
 Ready to run in your own lab.
 
 17
-00:01:15,800 --> 00:01:18,966
-Two layers of the epigenome.
-HisTLAND® and MeTLAND®.
+00:01:15,800 --> 00:01:19,563
+Two layers of the epigenome, measured
+with HisTLAND® and MeTLAND®.
 
 18
 00:01:22,800 --> 00:01:25,906
