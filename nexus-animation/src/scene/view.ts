@@ -81,7 +81,8 @@ function blendCam(a: CamState, b: CamState, u: number): CamState {
 /** Camera for a video frame. */
 export function viewAt(videoFrame: number): CamState {
   const t = videoFrame / FPS;
-  if (t < DIVE_IN) return cameraAt(545 + 45 * easeInOutCubic(t / DIVE_IN)); // tissue overview, slow drift
+  // open wide on the tissue and drift slowly inwards, so the film eases in instead of starting mid-scene
+  if (t < DIVE_IN) return cameraAt(522 + 68 * easeInOutCubic(t / DIVE_IN));
   if (t < INTRO_END - 1.6) {
     // dive into the neuron: the original pull-back (story 430..590) in reverse
     const u = (t - DIVE_IN) / (INTRO_END - 1.6 - DIVE_IN);

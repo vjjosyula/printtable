@@ -19,16 +19,19 @@ loadFont({family: fontFamily, url: staticFile('RedHatDisplay-latin.woff2'), weig
 
 /** On-screen captions (video seconds). `key` is the single highlighted word. */
 export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string}[] = [
-  {from: 0.3, to: 6.6, lines: ['In the brain, every cell', 'carries the same DNA.'], key: 'same'},
-  {from: 7.0, to: 9.8, lines: ['Each cell type reads', 'different genes.'], key: 'different'},
-  {from: 10.1, to: 13.9, lines: ['Grind the tissue together,', 'and signals get diluted.'], key: 'diluted.'},
+  {from: 1.7, to: 5.2, lines: ['Every cell carries', 'the same DNA.'], key: 'same'},
+  {from: 5.4, to: 9.4, lines: ['So why does a neuron behave', 'nothing like the cell beside it?'], key: 'why'},
+  {from: 9.6, to: 12.9, lines: ['Each cell type reads', 'different genes.'], key: 'different'},
+  {from: 13.0, to: 16.4, lines: ['Grind the tissue together,', 'and signals get diluted.'], key: 'diluted.'},
   {from: 17.6, to: 24.4, lines: ['Your DNA is wrapped', 'around histones.'], key: 'histones.'},
   {from: 24.8, to: 29.6, lines: ['Marks on histones decide', 'which genes are read.'], key: 'Marks'},
   {from: 29.9, to: 35.1, lines: ['H3K27ac opens', 'the DNA.'], key: 'H3K27ac'},
-  {from: 35.4, to: 40.2, lines: ['H3K27me3 locks', 'it shut.'], key: 'H3K27me3'},
-  {from: 40.7, to: 49.6, lines: ['HisTLAND®: two histone marks', 'from one sample,', 'in bulk or single cells.'], key: 'HisTLAND®:'},
-  {from: 46.4, to: 55.6, lines: ['Epigenetic profiling', 'has another layer:', 'DNA methylation.'], key: 'methylation.'},
-  {from: 56.3, to: 65.6, lines: ['MeTLAND®: genome-wide methylation,', 'no bisulfite, no antibodies.'], key: 'MeTLAND®:'},
+  {from: 35.4, to: 40.3, lines: ['H3K27me3 locks', 'it shut.'], key: 'H3K27me3'},
+  {from: 40.6, to: 44.5, lines: ['To measure these marks,', 'NEXUS built HisTLAND®.'], key: 'HisTLAND®.'},
+  {from: 44.7, to: 49.6, lines: ['Two histone marks from one sample,', 'in bulk or single cells.'], key: 'one'},
+  {from: 49.9, to: 55.8, lines: ['Epigenetic profiling', 'has another layer:', 'DNA methylation.'], key: 'methylation.'},
+  {from: 56.0, to: 59.5, lines: ['For that layer,', 'NEXUS built MeTLAND®.'], key: 'MeTLAND®.'},
+  {from: 59.7, to: 65.6, lines: ['Genome-wide methylation,', 'no bisulfite, no antibodies.'], key: 'Genome-wide'},
   {from: 66.3, to: 71.9, lines: ['Built around published methods', 'from academic labs.'], key: 'published'},
   {from: 72.2, to: 77.8, lines: ['Made into kits you can run', 'in your own lab.'], key: 'kits'},
   {from: 78.3, to: 84.8, lines: ['Two layers of the epigenome.', 'HisTLAND® and MeTLAND®.'], key: 'Two'},
@@ -185,12 +188,12 @@ const CELL_BG: Record<string, string> = {neuron: C.magenta, astro: C.teal, oligo
 const CellLabels: React.FC<{vf: number; w: number; h: number}> = ({vf, w, h}) => {
   const proj = makeProjector(vf, w, h);
   const vt = vf / FPS;
-  const out = 1 - ramp(vt, 9.2, 9.8, (x) => x);
+  const out = 1 - ramp(vt, 8.8, 9.4, (x) => x);
   const square = h < 1200;
   // place labels, then push apart any that would overlap
   const fs = square ? 26 : 30;
   const items = TYPES.map((t, i) => {
-    const o = ramp(vt, 1.4 + i * 0.3, 1.9 + i * 0.3, (x) => x) * out;
+    const o = ramp(vt, 2.6 + i * 0.3, 3.1 + i * 0.3, (x) => x) * out;
     const c = repCell(t);
     const p = proj(c.pos.clone().multiplyScalar(TISSUE_K).add(NUCLEUS_CENTER));
     const half = (CELL_NAME[t].length * 0.56 * fs + 32) / 2;
@@ -239,8 +242,8 @@ const GapLabels: React.FC<{vf: number; w: number; h: number}> = ({vf, w, h}) => 
     const below = p.y + dy < h - 170;
     nodes.push(<Tag key={key} x={p.x} y={p.y} {...props} o={o} side={p.x > w * 0.5 ? -1 : 1} dy={up || !below ? -Math.abs(dy) * 0.8 : dy} h={h} />);
   };
-  tag('h', a.histMark, ramp(t, 42.8, 43.4, (x) => x) * (1 - ramp(t, 49.4, 49.9, (x) => x)), 'h');
-  tag('m', a.metMethyl, ramp(t, 57.2, 57.8, (x) => x) * (1 - ramp(t, 65.2, 65.7, (x) => x)), 'm');
+  tag('h', a.histMark, ramp(t, 42.2, 42.8, (x) => x) * (1 - ramp(t, 49.4, 49.9, (x) => x)), 'h');
+  tag('m', a.metMethyl, ramp(t, 56.6, 57.2, (x) => x) * (1 - ramp(t, 65.2, 65.7, (x) => x)), 'm');
   const oL = ramp(t, 79.4, 80.0, (x) => x) * (1 - ramp(t, 84.4, 84.9, (x) => x));
   tag('lh', a.layersMark, oL, 'h', true);
   tag('lm', a.layersMethyl, oL, 'm');
@@ -279,7 +282,7 @@ export const Overlay: React.FC = () => {
         </div>
       ) : null}
       {sf > 200 && t < GAP_T0 ? <MarkTags sf={sf} vf={f} w={width} h={height} /> : null}
-      {t > 1 && t < 10 ? <CellLabels vf={f} w={width} h={height} /> : null}
+      {t > 2.2 && t < 9.6 ? <CellLabels vf={f} w={width} h={height} /> : null}
       {t > 42 && t < 85.2 ? <GapLabels vf={f} w={width} h={height} /> : null}
       {CAPTIONS.map((c, i) => (
         <Caption key={i} c={c} t={t} size={square ? 54 : 60} top={tall ? 190 : 116} />

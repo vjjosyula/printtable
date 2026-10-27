@@ -1,18 +1,24 @@
 [
  {
-  "start": 0.4,
-  "say": "In the brain, neurons, astrocytes, oligodendrocytes and microglia all carry the same DNA.",
-  "show": "In the brain, neurons, astrocytes, oligodendrocytes and microglia all carry the same DNA.",
+  "start": 1.8,
+  "say": "Every cell in your body carries the same DNA.",
+  "show": "Every cell in your body carries the same DNA.",
   "speed": 1.05
  },
  {
-  "start": 7.0,
-  "say": "Yet each cell type reads different genes.",
-  "show": "Yet each cell type reads different genes.",
+  "start": 5.4,
+  "say": "So why does a neuron behave nothing like the cell beside it?",
+  "show": "So why does a neuron behave nothing like the cell beside it?",
   "speed": 1.05
  },
  {
-  "start": 10.2,
+  "start": 9.6,
+  "say": "In the brain, each cell type reads different genes.",
+  "show": "In the brain, each cell type reads different genes.",
+  "speed": 1.05
+ },
+ {
+  "start": 13.0,
   "say": "Grind the tissue together, and those signals are diluted.",
   "show": "Grind the tissue together, and those signals are diluted.",
   "speed": 1.05
@@ -42,21 +48,33 @@
   "speed": 1.05
  },
  {
-  "start": 41.0,
-  "say": "Histland reads two histone marks from one sample, in bulk or in single cells.",
-  "show": "HisTLAND\u00ae reads two histone marks from one sample, in bulk or in single cells.",
+  "start": 41.2,
+  "say": "To measure these marks, NEXUS built Histland.",
+  "show": "To measure these marks, NEXUS built HisTLAND\u00ae.",
   "speed": 1.05
  },
  {
-  "start": 46.6,
+  "start": 44.8,
+  "say": "It reads two histone marks from one sample, in bulk or in single cells.",
+  "show": "It reads two histone marks from one sample, in bulk or in single cells.",
+  "speed": 1.05
+ },
+ {
+  "start": 50.2,
   "say": "Epigenetic profiling has another layer, DNA methylation, written on the DNA itself.",
   "show": "Epigenetic profiling has another layer, DNA methylation, written on the DNA itself.",
   "speed": 1.08
  },
  {
-  "start": 56.5,
-  "say": "Metland maps DNA methylation without bisulfite or antibodies.",
-  "show": "MeTLAND\u00ae maps DNA methylation without bisulfite or antibodies.",
+  "start": 56.4,
+  "say": "For that layer, NEXUS built Metland.",
+  "show": "For that layer, NEXUS built MeTLAND\u00ae.",
+  "speed": 1.05
+ },
+ {
+  "start": 59.8,
+  "say": "It maps DNA methylation without bisulfite or antibodies.",
+  "show": "It maps DNA methylation without bisulfite or antibodies.",
   "speed": 1.05
  },
  {
