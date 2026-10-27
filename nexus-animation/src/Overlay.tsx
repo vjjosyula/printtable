@@ -19,22 +19,23 @@ loadFont({family: fontFamily, url: staticFile('RedHatDisplay-latin.woff2'), weig
 
 /** On-screen captions (video seconds). `key` is the single highlighted word. */
 export const CAPTIONS: {from: number; to: number; lines: string[]; key?: string}[] = [
-  {from: 1.7, to: 5.2, lines: ['Every cell carries', 'the same DNA.'], key: 'same'},
-  {from: 5.4, to: 9.4, lines: ['So why does a neuron behave', 'nothing like the cell beside it?'], key: 'why'},
-  {from: 9.6, to: 12.9, lines: ['Each cell type reads', 'different genes.'], key: 'different'},
-  {from: 13.0, to: 16.4, lines: ['Grind the tissue together,', 'and signals get diluted.'], key: 'diluted.'},
-  {from: 17.6, to: 24.4, lines: ['Your DNA is wrapped', 'around histones.'], key: 'histones.'},
-  {from: 24.8, to: 29.6, lines: ['Marks on histones decide', 'which genes are read.'], key: 'Marks'},
+  {from: 1.9, to: 4.9, lines: ['Every cell carries', 'the same DNA.'], key: 'same'},
+  {from: 5.3, to: 8.8, lines: ['So why does a neuron behave', 'nothing like the cell beside it?'], key: 'why'},
+  {from: 9.1, to: 13.4, lines: ['In any one cell,', 'only part of that DNA', 'is switched on.'], key: 'part'},
+  {from: 13.7, to: 17.0, lines: ['Which genes are on', 'is set by the epigenome.'], key: 'epigenome.'},
+  {from: 17.1, to: 20.5, lines: ['Two layers:', 'histone marks and', 'DNA methylation.'], key: 'layers:'},
+  {from: 20.7, to: 25.4, lines: ['DNA is wrapped', 'around histones.'], key: 'histones.'},
+  {from: 25.7, to: 29.6, lines: ['Marks on histone tails decide', 'which genes are read.'], key: 'Marks'},
   {from: 29.9, to: 35.1, lines: ['H3K27ac opens', 'the DNA.'], key: 'H3K27ac'},
   {from: 35.4, to: 40.3, lines: ['H3K27me3 locks', 'it shut.'], key: 'H3K27me3'},
   {from: 40.6, to: 44.5, lines: ['To measure these marks,', 'NEXUS built HisTLAND®.'], key: 'HisTLAND®.'},
   {from: 44.7, to: 49.6, lines: ['Two histone marks from one sample,', 'in bulk or single cells.'], key: 'one'},
-  {from: 49.9, to: 55.8, lines: ['Epigenetic profiling', 'has another layer:', 'DNA methylation.'], key: 'methylation.'},
+  {from: 49.9, to: 55.8, lines: ['The second layer is written', 'on the DNA itself:', 'methylation.'], key: 'methylation.'},
   {from: 56.0, to: 59.5, lines: ['For that layer,', 'NEXUS built MeTLAND®.'], key: 'MeTLAND®.'},
   {from: 59.7, to: 65.6, lines: ['Genome-wide methylation,', 'no bisulfite, no antibodies.'], key: 'Genome-wide'},
   {from: 66.3, to: 71.9, lines: ['Built around published methods', 'from academic labs.'], key: 'published'},
-  {from: 72.2, to: 77.8, lines: ['Made into kits you can run', 'in your own lab.'], key: 'kits'},
-  {from: 78.3, to: 84.8, lines: ['Two layers of the epigenome.', 'HisTLAND® and MeTLAND®.'], key: 'Two'},
+  {from: 72.2, to: 75.1, lines: ['Made into kits you can run', 'in your own lab.'], key: 'kits'},
+  {from: 75.4, to: 81.6, lines: ['Two layers of the epigenome.', 'HisTLAND® and MeTLAND®.'], key: 'Two'},
 ];
 
 const fadeWin = (t: number, a: number, b: number, d = 0.35) =>
@@ -92,7 +93,7 @@ function makeProjector(vf: number, w: number, h: number) {
   cam.position.copy(s.pos);
   cam.up.set(0, 1, 0);
   cam.lookAt(s.target);
-  const offY = offsetAt(vf);
+  const offY = offsetAt(vf) * (w > h ? 0.4 : 1);
   cam.setViewOffset(w, h, 0, -h * offY, w, h);
   cam.updateProjectionMatrix();
   cam.updateMatrixWorld();
@@ -188,7 +189,7 @@ const CELL_BG: Record<string, string> = {neuron: C.magenta, astro: C.teal, oligo
 const CellLabels: React.FC<{vf: number; w: number; h: number}> = ({vf, w, h}) => {
   const proj = makeProjector(vf, w, h);
   const vt = vf / FPS;
-  const out = 1 - ramp(vt, 8.8, 9.4, (x) => x);
+  const out = 1 - ramp(vt, 12.6, 13.4, (x) => x);
   const square = h < 1200;
   // place labels, then push apart any that would overlap
   const fs = square ? 26 : 30;
@@ -244,7 +245,7 @@ const GapLabels: React.FC<{vf: number; w: number; h: number}> = ({vf, w, h}) => 
   };
   tag('h', a.histMark, ramp(t, 42.2, 42.8, (x) => x) * (1 - ramp(t, 49.4, 49.9, (x) => x)), 'h');
   tag('m', a.metMethyl, ramp(t, 56.6, 57.2, (x) => x) * (1 - ramp(t, 65.2, 65.7, (x) => x)), 'm');
-  const oL = ramp(t, 79.4, 80.0, (x) => x) * (1 - ramp(t, 84.4, 84.9, (x) => x));
+  const oL = ramp(t, 76.4, 77.0, (x) => x) * (1 - ramp(t, 81.6, 82.1, (x) => x));
   tag('lh', a.layersMark, oL, 'h', true);
   tag('lm', a.layersMethyl, oL, 'm');
   return <>{nodes}</>;
@@ -262,10 +263,11 @@ export const Overlay: React.FC = () => {
   const {width, height} = useVideoConfig();
   const square = height < 1200;
   const tall = height > 1500;
-  const endStart = 85.2;
+  const wide = width > height;
+  const endStart = 82.0;
   return (
     <AbsoluteFill style={{pointerEvents: 'none'}}>
-      {LOGO_FILE && t > 1.5 && t < 85.0 ? (
+      {LOGO_FILE && t > 1.5 && t < 81.8 ? (
         <div
           style={{
             position: 'absolute',
@@ -275,27 +277,27 @@ export const Overlay: React.FC = () => {
             borderRadius: 16,
             background: 'rgba(244,241,236,0.88)',
             boxShadow: '0 6px 20px rgba(63,68,74,0.08)',
-            opacity: interpolate(t, [1.5, 2.5, 84.3, 85.0], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}),
+            opacity: interpolate(t, [1.5, 2.5, 81.2, 81.8], [0, 1, 1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}),
           }}
         >
           <Img src={staticFile(LOGO_FILE)} style={{height: square ? 40 : 46, width: 'auto', display: 'block'}} />
         </div>
       ) : null}
       {sf > 200 && t < GAP_T0 ? <MarkTags sf={sf} vf={f} w={width} h={height} /> : null}
-      {t > 2.2 && t < 9.6 ? <CellLabels vf={f} w={width} h={height} /> : null}
-      {t > 42 && t < 85.2 ? <GapLabels vf={f} w={width} h={height} /> : null}
+      {t > 2.2 && t < 13.6 ? <CellLabels vf={f} w={width} h={height} /> : null}
+      {t > 42 && t < 82.0 ? <GapLabels vf={f} w={width} h={height} /> : null}
       {CAPTIONS.map((c, i) => (
-        <Caption key={i} c={c} t={t} size={square ? 54 : 60} top={tall ? 190 : 116} />
+        <Caption key={i} c={c} t={t} size={wide ? 46 : square ? 54 : 60} top={tall ? 190 : wide ? 54 : 116} />
       ))}
       {t >= endStart ? (
         <div style={{position: 'absolute', left: 80, right: 80, bottom: tall ? 320 : 80, fontFamily, color: C.charcoal}}>
-          <EndLine t={t} at={85.3} style={{marginBottom: square ? 4 : 8}}>
+          <EndLine t={t} at={82.2} style={{marginBottom: square ? 4 : 8}}>
             <Img src={staticFile(LOGO_FILE ?? 'logo.png')} style={{height: square ? 112 : 136, width: 'auto', display: 'block'}} />
           </EndLine>
-          <EndLine t={t} at={86.0} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: square ? 12 : 20, lineHeight: 1.25}}>
+          <EndLine t={t} at={82.8} style={{fontWeight: 500, fontSize: square ? 36 : 44, marginTop: square ? 12 : 20, lineHeight: 1.25}}>
             Founded in Stockholm.
           </EndLine>
-          <EndLine t={t} at={86.6} style={{fontWeight: 800, fontSize: square ? 48 : 58, marginTop: square ? 18 : 30, letterSpacing: -0.5, lineHeight: 1.12, maxWidth: 920}}>
+          <EndLine t={t} at={83.5} style={{fontWeight: 800, fontSize: square ? 48 : 58, marginTop: square ? 18 : 30, letterSpacing: -0.5, lineHeight: 1.12, maxWidth: 920}}>
             What is the question you are solving in epigenetics?
           </EndLine>
         </div>

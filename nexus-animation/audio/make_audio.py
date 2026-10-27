@@ -218,14 +218,14 @@ add(riser(1.6, 300, 6000), 67.0, 0.05, 0)                   # the protocol becom
 add(chime(84, 3.0), 68.6, 0.08, 0)
 for q in range(8):                                          # kits arrive in every lab
     add(chime([72, 76, 79, 84][q % 4] + 12 * (q // 4), 2.2), 70.4 + q * 0.32, 0.05, -0.5 + q * 0.14)
-add(chime(88, 3.2), 79.0, 0.08, 0)                          # the two layers together
-add(chime(91, 3.2), 79.5, 0.06, 0.2)
+add(chime(88, 3.2), 76.2, 0.08, 0)                          # the two layers together
+add(chime(91, 3.2), 76.7, 0.06, 0.2)
 
 # ---------------------------------------------------------------- final chord + tail
 fin_n = int(6.0 * SR)
 tt = np.arange(fin_n) / SR
 fin = sum(np.sin(2 * np.pi * midi(m) * tt) for m in [53, 60, 65, 69, 72, 76]) / 6
-add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 85.2, 0.24, 0)
+add(fin * np.exp(-tt * 0.6) * np.minimum(1, tt * 8), 82.0, 0.24, 0)
 
 music = np.stack([L, R], 1)
 # gentle master: fade in/out, soft clip

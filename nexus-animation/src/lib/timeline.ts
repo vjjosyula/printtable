@@ -34,7 +34,7 @@ const tangents = (() => {
  * INTRO_END..STORY_STOP the chromatin story (story seconds 0..13, the original 31 s cut, played a little faster),
  * then the kit stage (scene/view.ts, scene/GapStage.tsx) on video time.
  */
-export const INTRO_END = 17.6;
+export const INTRO_END = 20.6;
 export const STORY_STOP_S = 40.2;
 const STORY_LEN = 31; // original video length of the chromatin section, the KEYS domain used here
 

@@ -475,12 +475,12 @@ export const GapStage: React.FC = () => {
           <ReadStack pos={v3(6, -12, 0)} cols={2} rows={8} p={mReads} seed={9} />
         </group>
       ) : null}
-      {win(t, 65.0, 79.6) ? (
+      {win(t, 65.0, 76.4) ? (
         <group position={[GAP.labs, 0, 0]}>
           <LabScene t={t} />
         </group>
       ) : null}
-      {win(t, 76.8, 90.1) ? (
+      {win(t, 74.6, 90.1) ? (
         <group position={[GAP.layers, 0, 0]}>
           <DNA cl={b.lCl} anchor={b.lAnchor} lollies={b.lLollies} />
           <Nucleosomes nucs={b.lNucs} />

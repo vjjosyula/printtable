@@ -1,6 +1,6 @@
 [
  {
-  "start": 1.8,
+  "start": 2.0,
   "say": "Every cell in your body carries the same DNA.",
   "show": "Every cell in your body carries the same DNA.",
   "speed": 1.05
@@ -12,27 +12,33 @@
   "speed": 1.05
  },
  {
-  "start": 9.6,
-  "say": "In the brain, each cell type reads different genes.",
-  "show": "In the brain, each cell type reads different genes.",
+  "start": 9.2,
+  "say": "Because in any one cell, only part of that DNA is ever switched on.",
+  "show": "Because in any one cell, only part of that DNA is ever switched on.",
   "speed": 1.05
  },
  {
-  "start": 13.0,
-  "say": "Grind the tissue together, and those signals are diluted.",
-  "show": "Grind the tissue together, and those signals are diluted.",
+  "start": 13.8,
+  "say": "Which genes are switched on is set by the epigenome.",
+  "show": "Which genes are switched on is set by the epigenome.",
   "speed": 1.05
  },
  {
-  "start": 17.8,
-  "say": "Inside every nucleus, DNA is wrapped around proteins called histones.",
-  "show": "Inside every nucleus, DNA is wrapped around proteins called histones.",
+  "start": 17.2,
+  "say": "Two layers: marks on histones, and methylation on the DNA itself.",
+  "show": "Two layers: marks on histones, and methylation on the DNA itself.",
   "speed": 1.05
  },
  {
-  "start": 24.9,
-  "say": "Small marks on histone tails decide which genes are read.",
-  "show": "Small marks on histone tails decide which genes are read.",
+  "start": 21.8,
+  "say": "Inside the nucleus, DNA is wrapped around histones.",
+  "show": "Inside the nucleus, DNA is wrapped around histones.",
+  "speed": 1.05
+ },
+ {
+  "start": 25.8,
+  "say": "Small marks on their tails decide which genes are read.",
+  "show": "Small marks on their tails decide which genes are read.",
   "speed": 1.05
  },
  {
@@ -61,9 +67,9 @@
  },
  {
   "start": 50.2,
-  "say": "Epigenetic profiling has another layer, DNA methylation, written on the DNA itself.",
-  "show": "Epigenetic profiling has another layer, DNA methylation, written on the DNA itself.",
-  "speed": 1.08
+  "say": "The second layer is written on the DNA itself: methylation.",
+  "show": "The second layer is written on the DNA itself: methylation.",
+  "speed": 1.05
  },
  {
   "start": 56.4,
@@ -90,13 +96,13 @@
   "speed": 1.05
  },
  {
-  "start": 78.4,
+  "start": 75.8,
   "say": "Two layers of the epigenome. Histland and Metland.",
   "show": "Two layers of the epigenome. HisTLAND\u00ae and MeTLAND\u00ae.",
   "speed": 1.05
  },
  {
-  "start": 86.3,
+  "start": 82.8,
   "say": "What is the question you are solving in epigenetics?",
   "show": "What is the question you are solving in epigenetics?",
   "speed": 1.05

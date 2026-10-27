@@ -47,7 +47,8 @@ export const Rig: React.FC<{dofScale?: number}> = () => {
     cam.near = s.dist * 0.02;
     cam.far = s.dist * 40;
     // keep subjects below the caption band (top third); centred again for the end card
-    const offY = offsetAt(f);
+    // landscape frames need less of a downward shift than the tall social formats
+    const offY = offsetAt(f) * (size.width > size.height ? 0.4 : 1);
     cam.setViewOffset(size.width, size.height, 0, -size.height * offY, size.width, size.height);
     cam.updateProjectionMatrix();
     cam.updateMatrixWorld();

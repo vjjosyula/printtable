@@ -12,7 +12,7 @@ import {cameraAt, CamState, viewOffsetY} from './camera';
  */
 export const GAP_T0 = STORY_STOP_S;
 const GLIDE = 1.6; // seconds from the end of the chromatin story to the first kit scene
-const DIVE_IN = 14.8; // start of the dive into the neuron
+const DIVE_IN = 17.0; // start of the dive into the neuron
 
 /** World position of the kit stage: in the same nucleus, beside the chromatin, away from the chain. */
 const ORIGIN = new THREE.Vector3(0, -40, -260);
@@ -48,11 +48,11 @@ const KEYS: [number, [number, number, number], number, number, number][] = [
   [57.0, [299, -2, 0], 84, -0.25, 0.22],
   [65.4, [300, -1, 0], 80, -0.1, 0.18],
   [67.2, [520, -2, 0], 150, -0.1, 0.52],
-  [77.0, [520, 0, 0], 138, 0.35, 0.46],
-  [78.9, [762, -1, 0], 88, -0.2, 0.22],
-  [84.6, [763, 0, 0], 82, -0.05, 0.18],
-  [86.2, [763, 2, 0], 104, 0, 0.14],
-  [90.0, [763, 2, 0], 106, 0, 0.14],
+  [74.2, [520, 0, 0], 138, 0.35, 0.46],
+  [75.8, [762, -1, 0], 88, -0.2, 0.22],
+  [81.4, [763, 0, 0], 82, -0.05, 0.18],
+  [82.6, [763, 2, 0], 100, 0, 0.14],
+  [90.0, [763, 2, 0], 102, 0, 0.14],
 ];
 const TGT: K3[] = KEYS.map(([t, p]) => [t, p]);
 const LOGD: K1[] = KEYS.map(([t, , d]) => [t, Math.log(d)]);
@@ -96,6 +96,7 @@ export function viewAt(videoFrame: number): CamState {
 
 /** Vertical field of view: tall frames keep the 4:5 horizontal view and see more above and below. */
 export function fovFor(aspect: number, base = 34) {
+  if (aspect >= 1.2) return 24; // 16:9 landscape
   if (aspect >= 0.8) return base;
   const h = Math.atan(Math.tan(THREE.MathUtils.degToRad(base / 2)) * 0.8);
   return THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(h) / aspect));
@@ -106,5 +107,5 @@ export function offsetAt(videoFrame: number) {
   const t = videoFrame / FPS;
   if (t <= GAP_T0) return viewOffsetY(0);
   // lifted above the end-card text at the end
-  return 0.085 - 0.215 * smoothstep(84.8, 86.4, t);
+  return 0.085 - 0.215 * smoothstep(81.4, 82.9, t);
 }

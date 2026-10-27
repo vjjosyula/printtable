@@ -268,7 +268,7 @@ const sphere = new THREE.SphereGeometry(1, 32, 24);
 const grey = new THREE.Color('#9AA6B4');
 
 /** Dilution beat (video seconds): the cell types swirl together, then separate again for the dive. */
-export const blendAmount = (t: number) => ramp(t, 10.2, 12.4, easeInOutCubic) * (1 - ramp(t, 13.2, 14.8, easeInOutCubic));
+export const blendAmount = (_t: number) => 0;
 
 export const Tissue: React.FC = () => {
   const vf = useCurrentFrame();
@@ -296,7 +296,7 @@ export const Tissue: React.FC = () => {
   accentMat.opacity = fade;
   accentMat.color.set('#D8CB98').lerp(grey, blend);
   nucOutlineMat.opacity = fade * (1 - blend * 0.6);
-  const swirlT = vt - 10.2;
+  const swirlT = 0;
   return (
     <group position={NUCLEUS_CENTER} scale={TISSUE_K}>
       {cells.map((c, i) => {
